@@ -6,8 +6,8 @@ import region_utils
 import mutator
 
 with atheris.instrument_imports():
-    from verapak.verapak.verification.ve import UNKNOWN
-    from verapak.algorithm import falsify
+    from VERAPAK.verapak.verification.ve import UNKNOWN
+    from VERAPAK.algorithm import falsify
 
 
 # Load config/sets only once at startup
