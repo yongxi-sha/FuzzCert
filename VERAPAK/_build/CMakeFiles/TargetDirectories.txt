@@ -1,7 +1,0 @@
-/src/VERAPAK/_build/CMakeFiles/install/strip.dir
-/src/VERAPAK/_build/CMakeFiles/edit_cache.dir
-/src/VERAPAK/_build/CMakeFiles/verapak_utils.dir
-/src/VERAPAK/_build/CMakeFiles/rebuild_cache.dir
-/src/VERAPAK/_build/CMakeFiles/list_install_components.dir
-/src/VERAPAK/_build/CMakeFiles/install/local.dir
-/src/VERAPAK/_build/CMakeFiles/install.dir
