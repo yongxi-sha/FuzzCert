@@ -6,7 +6,7 @@ import config_loader
 import region_utils
 import mutator
 
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "VERAPAK"))
 
 with atheris.instrument_imports():
     from VERAPAK.verapak.verification.ve import UNKNOWN
