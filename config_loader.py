@@ -1,8 +1,8 @@
 import os
 import time
-from VERAPAK.config import Config
-from VERAPAK.verapak.parse_args.tools import parse_args
-from VERAPAK.verapak.utilities.sets import make_sets, Reporter
+from verapak.config import Config
+from verapak.verapak.parse_args.tools import parse_args
+from verapak.verapak.utilities.sets import make_sets, Reporter
 
 def load_config_from_corpus(corpus_dir="corpus"):
     for filename in os.listdir(corpus_dir):
