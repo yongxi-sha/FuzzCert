@@ -1,9 +1,12 @@
 import sys
+import os
 import atheris
 import numpy as np
 import config_loader
 import region_utils
 import mutator
+
+sys.path.insert(0, os.path.dirname(__file__))
 
 with atheris.instrument_imports():
     from VERAPAK.verapak.verification.ve import UNKNOWN
