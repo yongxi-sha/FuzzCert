@@ -1,124 +1,38 @@
 import sys
-import atheris
-import tempfile
 import os
-import traceback
-import time
+import atheris
 import numpy as np
+import config_loader
+import region_utils
+import mutator
 
 with atheris.instrument_imports():
-    from VERAPAK.config import Config
-    from VERAPAK.verapak.parse_args.tools import parse_args
     from VERAPAK.verapak.verification.ve import UNKNOWN
-    from VERAPAK.verapak.abstraction.ae import AbstractionEngine
-    from VERAPAK.algorithm import main, verify, falsify
-    from VERAPAK.verapak.utilities.sets import make_sets, Reporter
-    import VERAPAK.fuzz_target
-
-corpus_dir="corpus"
-for filename in os.listdir(corpus_dir):
-    path=os.path.join(corpus_dir,filename)
-    fuzz_args=[
-        f"--config_file={path}",
-        "--output_dir=/src/out",
-        "--halt_on_first=loose",
-    ]
-    break
-
-def get_config(args):
-    config = parse_args(fuzz_args, prog="fuzz_target.py")
-    config = Config(config)
-    return config
+    from VERAPAK.algorithm import falsify
 
 
-def get_init_region(config):
-    initial_region=config["initial_region"]
-    return initial_region
+# Load config/sets only once at startup
+config, reporter, sets = config_loader.load_config_from_corpus()
+# calculate initial region/area 
+region = config["initial_region"]
+area = reporter.get_area(region)
 
-
-def get_init_area(reporter, region):
-    area=reporter.get_area(region)
-    return area
-
-
-config=get_config(fuzz_args)
-region=get_init_region(config)
-reporter=Reporter()
-start_time=time.time()
-reporter.setup(config,start_time)
-sets=make_sets(reporter)
-area=get_init_area(reporter,region)
-from_=UNKNOWN
-
-def deserialize_input(data):
-    try:
-        region_data, area = pickle.loads(data)
-        low, high = region_data
-        low = np.array(low, dtype=input_dtype)
-        high = np.array(high, dtype=input_dtype)
-        return (low, high, ()), area
-    except Exception:
-        region = random_region()
-        area = 1.0
-        return region, area
-
-
-def my_mutator(data, max_size, seed):
-    
-    '''
-    random.seed(seed)
-    np.random.seed(seed)
-    try:
-        region_data, area = pickle.loads(data)
-        low, high = region_data
-        low = np.array(low, dtype=input_dtype)
-        high = np.array(high, dtype=input_dtype)
-        region = (low, high, ())
-    except Exception:
-        region = random_region()
-        area = 1.0
-
-    region = mutate_region(region)
-    area += random.uniform(-0.05, 0.05)
-    area = max(area, 0.0)
-
-    # serialize as (list, list), area
-    serialized = pickle.dumps(((region[0].tolist(), region[1].tolist()), area))
-    return serialized[:max_size]
-    '''
-    
-    pass
+from_ = UNKNOWN
+input_dtype = config['graph'].input_dtype
 
 def TestOneInput(data):
+    try:
+        #region_mutated, area_mutated = region_utils.deserialize_input(data, input_dtype)
 
-    #region, area = deserialize_input(data)
+        for strategy in config["strategy"].values():
+            strategy.set_config(config)
 
-    print("++++++++++++++++config++++++++++++++++++++++")
-    print(config)
-    print("++++++++++++++++config++++++++++++++++++++++")
-    print("----------------sets----------------------")
-    print(sets)
-    print("----------------sets----------------------")
-    print("****************from_**********************")
-    print(from_)
-    print("****************from_**********************")
-    print("^^^^^^^^^^^^^^^^region^^^^^^^^^^^^^^^^^^^^^^")
-    print(region)
-    print("^^^^^^^^^^^^^^^^region^^^^^^^^^^^^^^^^^^^^^^")
-    print("%%%%%%%%%%%%%%%%%area%%%%%%%%%%%%%%%%%%%%%")
-    print(area)
-    print("%%%%%%%%%%%%%%%%%area%%%%%%%%%%%%%%%%%%%%%")
-    for strategy in config["strategy"].values():
-        strategy.set_config(config)
+        falsify(config, region, area, sets, from_)
 
-    falsify(config,region,area,sets,from_)
+        for strategy in config["strategy"].values():
+            strategy.shutdown()
+    except Exception:
+        pass
 
-    for strategy in config["strategy"].values():
-        strategy.shutdown()
-
-
-
-atheris.Setup(sys.argv, TestOneInput, custom_mutator=my_mutator)
+atheris.Setup(sys.argv, TestOneInput, custom_mutator=mutator.my_mutator)
 atheris.Fuzz()
-
-

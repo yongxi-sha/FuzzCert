@@ -13,7 +13,7 @@ with atheris.instrument_imports():
     from verapak.abstraction.ae import AbstractionEngine
     from algorithm import main, verify, falsify
     from verapak.utilities.sets import make_sets, Reporter
-    import fuzz_target
+    import fuzz_falsify
 
 corpus_dir="corpus"
 for filename in os.listdir(corpus_dir):
