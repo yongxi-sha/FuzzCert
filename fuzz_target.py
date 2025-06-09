@@ -1,14 +1,14 @@
 import sys
 import atheris
 import numpy as np
+import config_loader
+import region_utils
+import mutator
 
 with atheris.instrument_imports():
     from verapak.verification.ve import UNKNOWN
-    from verapak.abstraction.ae import AbstractionEngine
     from algorithm import falsify
-    import config_loader
-    import region_utils
-    import mutator
+
 
 # Load config/sets only once at startup
 config, reporter, sets = config_loader.load_config_from_corpus()
