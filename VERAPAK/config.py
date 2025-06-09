@@ -1,4 +1,5 @@
 import numpy as np
+from verapak import snap
 from verapak.constraints import SafetyPredicate, Constraints
 from verapak.model_tools.model_base import load_graph_by_type
 
