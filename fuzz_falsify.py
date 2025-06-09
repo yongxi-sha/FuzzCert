@@ -7,13 +7,13 @@ import time
 import numpy as np
 
 with atheris.instrument_imports():
-    from config import Config
-    from verapak.parse_args.tools import parse_args
-    from verapak.verification.ve import UNKNOWN
-    from verapak.abstraction.ae import AbstractionEngine
-    from algorithm import main, verify, falsify
-    from verapak.utilities.sets import make_sets, Reporter
-    import fuzz_target
+    from VERAPAK.config import Config
+    from VERAPAK.verapak.parse_args.tools import parse_args
+    from VERAPAK.verapak.verification.ve import UNKNOWN
+    from VERAPAK.verapak.abstraction.ae import AbstractionEngine
+    from VERAPAK.algorithm import main, verify, falsify
+    from VERAPAK.verapak.utilities.sets import make_sets, Reporter
+    import VERAPAK.fuzz_target
 
 corpus_dir="corpus"
 for filename in os.listdir(corpus_dir):
