@@ -16,7 +16,6 @@ def load_config_from_corpus(corpus_dir="corpus"):
 
     config_dict = parse_args(fuzz_args, prog="fuzz_target.py")
     config = Config(config_dict)
-
     reporter = Reporter()
     start_time = time.time()
     reporter.setup(config, start_time)
