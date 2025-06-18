@@ -3,7 +3,7 @@ sys.path.append('./experiments/VERAPAK')
 print(sys.path)
 import argparse
 from adapters.verapak_adapter import VerapakAdapter
-from fuzzcert.fuzz_main import start_fuzzing
+from fuzzer import start_fuzzing
 
 # Registry of supported benchmarks and their adapter classes
 ADAPTERS = {

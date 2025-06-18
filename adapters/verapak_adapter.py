@@ -6,7 +6,7 @@ from experiments.VERAPAK.config import Config
 from experiments.VERAPAK.verapak.parse_args.tools import parse_args
 from experiments.VERAPAK.verapak.utilities.sets import make_sets, Reporter
 from fuzzcert.bench_adapter import BenchAdapter
-import config_loader
+import falsify_interface2
 
 
 class VerapakAdapter(BenchAdapter):
@@ -32,6 +32,7 @@ class VerapakAdapter(BenchAdapter):
         self.from_ = UNKNOWN
 
         # Load VERAPAK config
+        config, partitions, sets=falsify_interface2()
         self.config_obj, self.reporter, self.sets = config_loader.load_config_from_corpus()
         self.region = self.config_obj["initial_region"]
         self.area = self.reporter.get_area(self.region)
