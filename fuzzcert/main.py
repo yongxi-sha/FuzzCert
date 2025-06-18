@@ -1,3 +1,6 @@
+import sys
+sys.path.append('./experiments/VERAPAK')
+print(sys.path)
 import argparse
 from adapters.verapak_adapter import VerapakAdapter
 from fuzzcert.fuzz_main import start_fuzzing

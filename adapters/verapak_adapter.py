@@ -2,9 +2,9 @@ import os
 import pickle
 import numpy as np
 import atheris
-from VERAPAK.config import Config
-from VERAPAK.verapak.parse_args.tools import parse_args
-from VERAPAK.verapak.utilities.sets import make_sets, Reporter
+from experiments.VERAPAK.config import Config
+from experiments.VERAPAK.verapak.parse_args.tools import parse_args
+from experiments.VERAPAK.verapak.utilities.sets import make_sets, Reporter
 from fuzzcert.bench_adapter import BenchAdapter
 import config_loader
 

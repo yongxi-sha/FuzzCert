@@ -6,8 +6,7 @@ setup(
     description="Fuzzing Framework for Certifiable Robustness of Neural Networks",
     author="Your Name",
     author_email="your.email@example.com",
-    packages=find_packages(where="fuzzcert"),
-    package_dir={"": "fuzzcert"},
+    packages=find_packages(),
     install_requires=[
         "numpy",
         "onnx",
@@ -15,14 +14,14 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "fuzzcert = main:main",  # from fuzzcert/main.py
+            "fuzzcert = fuzzcert.main:main",  # from fuzzcert/main.py
         ],
     },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.6',
 )
 
 
