@@ -13,12 +13,10 @@ from falsify_interface2 import *
 class VerapakAdapter(BenchAdapter):
     def __init__(self, config):
         super().__init__(config)
-        self.region = None
-        self.area = None
+        self.config_obj = None
+        self.partitions = None
         self.from_ = None
         self.input_dtype = None
-        self.config_obj = None
-        self.reporter = None
         self.sets = None
 
     def initialize(self, input_dir=None):
@@ -33,17 +31,14 @@ class VerapakAdapter(BenchAdapter):
         self.from_ = UNKNOWN
 
         # Load VERAPAK config
-        print("------------------input_dir--------------------------------")
-        print(input_dir)
-        print("------------------input_dir--------------------------------")
         fuzz_args = config_loader.load_config_from_corpus(input_dir)
         params=get_fal_paras(fuzz_args)
-        print("***********************params*******************************")
-        print(params)
-        print("***********************params*******************************")
-        self.region = self.config_obj["initial_region"]
-        self.area = self.reporter.get_area(self.region)
+        config, partitions, sets=params
+        self.config_obj=config
+        self.partitions=partitions
+        self.sets=sets
         self.input_dtype = self.config_obj['graph'].input_dtype
+        print(partitions)
 
     def mutate(self, base_input: np.ndarray) -> np.ndarray:
         """

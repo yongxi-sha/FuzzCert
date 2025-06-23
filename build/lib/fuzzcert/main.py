@@ -28,7 +28,7 @@ def main():
 
     AdapterClass = ADAPTERS[args.bench]
     adapter = AdapterClass(args)
-
+    print(sys.argv)
     start_fuzzing(adapter, args.input)
 
 
