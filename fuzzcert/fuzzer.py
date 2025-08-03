@@ -28,20 +28,18 @@ def TestOneInput(data: bytes) -> None:
     """
 
     try:
+
         # deserialize
         #region, area = adapter.deserialize(data, adapter.input_dtype)
+
         config=g_benchAdapter.config_obj
-        #print(config)
-        #print("1111111111111111111111111111111111111111111111111111111111")
+
         partitions=g_benchAdapter.partitions
-        #print(partitions)
-        #print("2222222222222222222222222222222222222222222222222222222222")
+
         from_=g_benchAdapter.from_
-        #print(from_)
-        #print("3333333333333333333333333333333333333333333333333333333333")
+
         sets=g_benchAdapter.sets
-        #print(sets)
-        #print("4444444444444444444444444444444444444444444444444444444444")
+
 
         for strategy in config["strategy"].values():
             strategy.set_config(config)
@@ -72,9 +70,8 @@ def start_fuzzing(benchAdapter, corpus_dir: str) -> None:
     global g_benchAdapter
     benchAdapter.initialize(corpus_dir)
     g_benchAdapter = benchAdapter
-    #print(g_benchAdapter.partitions)
-    #print(1111111111111111111111111111111)
     cleaned_argv=strip_fuzzcert_args(sys.argv)
+    print(cleaned_argv)
     # Use adapter’s own custom_mutator
     atheris.Setup(
         cleaned_argv,

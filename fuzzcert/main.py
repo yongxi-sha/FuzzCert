@@ -25,10 +25,8 @@ def parse_args():
 
 def main():
     args = parse_args()
-
     AdapterClass = ADAPTERS[args.bench]
     adapter = AdapterClass(args)
-    print(sys.argv)
     start_fuzzing(adapter, args.input)
 
 

@@ -1,23 +1,16 @@
 import os
 import sys
-#sys.path.append("../experiments/VERAPAK")
-#print(sys.path)
 import traceback
 import numpy as np
-
+import time
 
 from config import Config, ConfigError
 from verapak.parse_args.tools import parse_args
 from algorithm import main
-from verapak.utilities.sets import Reporter, DoneInterrupt
-
-
-import time
-import numpy as np
-
+from verapak.utilities.sets import Reporter, DoneInterrupt, make_sets
 from verapak.verification.ve import ALL_SAFE, ALL_UNSAFE, SOME_UNSAFE, TOO_BIG, UNKNOWN, BOUNDARY
 from verapak.utilities.point_tools import point_in_region
-from verapak.utilities.sets import make_sets
+
 
 def create_witness(config, adversarial_example):
     input_values = adversarial_example.flatten(),
