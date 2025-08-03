@@ -1,5 +1,6 @@
 import os
 import pickle
+import sys
 import numpy as np
 import atheris
 from fuzzcert.bench_adapter import BenchAdapter
@@ -29,8 +30,6 @@ class VerapakAdapter(BenchAdapter):
             from verapak.abstraction.ae import AbstractionEngine
             from algorithm import main, verify
 
-
-
         self.from_ = UNKNOWN
 
         # Load VERAPAK config
@@ -48,7 +47,22 @@ class VerapakAdapter(BenchAdapter):
         Placeholder for region mutation logic.
         Currently not implemented.
         """
-        raise NotImplementedError("VerapakAdapter.mutate is not implemented yet.")
+        #raise NotImplementedError("VerapakAdapter.mutate is not implemented yet.")
+        config=self.config_obj
+
+        partitions=self.partitions
+
+        from_=self.from_
+
+        sets=self.sets
+
+        for partiton in partitions:
+            high=partiton[0]
+            low=partiton[1]
+            print(f'partition:{partiton};  high:{high};  low:{low}')
+            break
+
+        sys.exit(0)
 
     def serialize(self, data, input_dtype) -> bytes:
         """
