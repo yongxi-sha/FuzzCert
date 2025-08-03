@@ -19,7 +19,8 @@ def parse_args():
                         help="Benchmark to fuzz (e.g., verapak)")
     parser.add_argument("--input", required=True,
                         help="Path to input directory or corpus root (adapter-specific)")
-
+    parser.add_argument("-max_len",required=True,
+                        help="Maximum length of custom_mutator")
     return parser.parse_args()
 
 
