@@ -61,7 +61,7 @@ def TestOneInput(data: bytes) -> None:
     try:
 
         # deserialize
-        partitions=pickle.loads(data)
+        partition=pickle.loads(data)
 
         config=g_benchAdapter.config_obj
 
@@ -79,22 +79,23 @@ def TestOneInput(data: bytes) -> None:
         for strategy in config["strategy"].values():
             strategy.set_config(config)
 
-        for partition in partitions:
+        
             
-            print(partition)
-            
-            falsify(config,partition,sets['reporter'].get_area(partition),sets,from_=from_)
+        print(partition)
 
-            post_set = {
-                "UNKNOWN": sets[UNKNOWN].set.size(),
-                "SAFE": sets[ALL_SAFE].set.size(),
-                "UNSAFE": sets[ALL_UNSAFE].set.size(),
-                "SOME_UNSAFE": sets[SOME_UNSAFE].queue.qsize()
-            }
-            if falsify_predicate(pre_set, post_set):
-                print("success")
-            else:
-                print("failure")
+        falsify(config,partition,sets['reporter'].get_area(partition),sets,from_=from_)
+
+        post_set = {
+            "UNKNOWN": sets[UNKNOWN].set.size(),
+            "SAFE": sets[ALL_SAFE].set.size(),
+            "UNSAFE": sets[ALL_UNSAFE].set.size(),
+            "SOME_UNSAFE": sets[SOME_UNSAFE].queue.qsize()
+        }
+
+        if falsify_predicate(pre_set, post_set):
+            print("success")
+        else:
+            print("failure")
 
         for strategy in config["strategy"].values():
             strategy.shutdown()

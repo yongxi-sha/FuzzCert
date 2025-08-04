@@ -45,7 +45,6 @@ class VerapakAdapter(BenchAdapter):
 
         random.seed(seed)
         partitions=self.partitions
-        new_partitions=[]
         for partiton in partitions:
             high=partiton[0]
             low=partiton[1]
@@ -62,9 +61,9 @@ class VerapakAdapter(BenchAdapter):
             new_low = low + (sign * random_mod)
 
             mutated_region = [new_high, new_low, partiton[2:]]
-            new_partitions.append(mutated_region)
+            break
 
-        encoded_partitions=pickle.dumps(new_partitions)
+        encoded_partitions=pickle.dumps(mutated_region)
         print(f'The returned data size is: {len(encoded_partitions)}')
 
         if len(encoded_partitions) <= max_size:
