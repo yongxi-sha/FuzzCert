@@ -70,13 +70,15 @@ def TestOneInput(data: bytes) -> None:
 
         sets=g_benchAdapter.sets
 
+        '''
         pre_set = {
             "UNKNOWN": sets[UNKNOWN].set.size(),
             "SAFE": sets[ALL_SAFE].set.size(),
             "UNSAFE": sets[ALL_UNSAFE].set.size(),
             "SOME_UNSAFE": sets[SOME_UNSAFE].queue.qsize()
         }
-
+        '''
+        
         #for strategy in config["strategy"].values():
         #    strategy.set_config(config)
 
