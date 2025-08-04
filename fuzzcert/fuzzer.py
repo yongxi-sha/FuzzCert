@@ -1,8 +1,9 @@
 import sys
 import atheris
+import pickle
 
 g_benchAdapter = None
-
+counter=0
 
 def strip_fuzzcert_args(argv):
     """Remove fuzzcert-specific args that Atheris doesn't understand"""
@@ -27,36 +28,35 @@ def TestOneInput(data: bytes) -> None:
     Atheris fuzzing entry point. Deserializes and runs verifier on input.
     """
 
+    global counter
+    counter+=1
+
     try:
 
         # deserialize
-        #region, area = adapter.deserialize(data, adapter.input_dtype)
+        partitions=pickle.loads(data)
 
         config=g_benchAdapter.config_obj
-
-        partitions=g_benchAdapter.partitions
 
         from_=g_benchAdapter.from_
 
         sets=g_benchAdapter.sets
 
-
         for strategy in config["strategy"].values():
             strategy.set_config(config)
-
 
         for partition in partitions:
             falsify(config,partition,sets['reporter'].get_area(partition),sets,from_=from_)
 
-
         for strategy in config["strategy"].values():
             strategy.shutdown()
 
-        # serialize
-        #data = adapter.serialize(data, adapter.input_dtype)
-
     except Exception:
         pass
+
+    if counter > 10:
+        sys.exit(0)
+
 
 
 def start_fuzzing(benchAdapter, corpus_dir: str) -> None:

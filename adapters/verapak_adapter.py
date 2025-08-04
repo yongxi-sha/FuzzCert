@@ -1,6 +1,5 @@
-import os
 import pickle
-import sys
+import random
 import numpy as np
 import atheris
 from fuzzcert.bench_adapter import BenchAdapter
@@ -43,26 +42,35 @@ class VerapakAdapter(BenchAdapter):
 
 
     def mutate(self, data, max_size, seed):
-        """
-        Placeholder for region mutation logic.
-        Currently not implemented.
-        """
-        #raise NotImplementedError("VerapakAdapter.mutate is not implemented yet.")
-        config=self.config_obj
-
+        
+        random.seed(seed)
         partitions=self.partitions
-
-        from_=self.from_
-
-        sets=self.sets
-
+        new_partitions=[]
         for partiton in partitions:
             high=partiton[0]
             low=partiton[1]
-            print(f'partition:{partiton};  high:{high};  low:{low}')
-            break
+            ceil = 1
+            floor = 0
 
-        print(sys.getsizeof(partitions))
+            # creates a random float between floor and ceil for each region position
+            random_mod = np.random.uniform(floor, ceil, size=high.shape)
+
+            # randomize sign for each region position (either add or subtract random_mod)
+            sign = np.random.choice([-1, 1], size=high.shape)
+
+            new_high = high + (sign * random_mod)
+            new_low = low + (sign * random_mod)
+
+            mutated_region = [new_high, new_low, partiton[2:]]
+            new_partitions.append(mutated_region)
+
+        encoded_partitions=pickle.dumps(new_partitions)
+        print(len(encoded_partitions))
+
+        if len(encoded_partitions) <= max_size:
+            return encoded_partitions[:max_size]
+        else:
+            raise NotImplementedError("returned data exceed max_len")
 
     def serialize(self, data, input_dtype) -> bytes:
         """
