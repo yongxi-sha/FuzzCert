@@ -80,7 +80,8 @@ def TestOneInput(data: bytes) -> None:
             strategy.set_config(config)
 
         for partition in partitions:
-
+            
+            print(partition)
             falsify(config,partition,sets['reporter'].get_area(partition),sets,from_=from_)
 
             post_set = {
