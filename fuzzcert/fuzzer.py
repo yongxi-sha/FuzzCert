@@ -62,8 +62,8 @@ def TestOneInput(data: bytes) -> None:
 
         # deserialize
         partition=pickle.loads(data)
-        print(partition)
-        
+        #print(partition)
+
         config=g_benchAdapter.config_obj
 
         from_=g_benchAdapter.from_
@@ -77,8 +77,8 @@ def TestOneInput(data: bytes) -> None:
             "SOME_UNSAFE": sets[SOME_UNSAFE].queue.qsize()
         }
 
-        for strategy in config["strategy"].values():
-            strategy.set_config(config)
+        #for strategy in config["strategy"].values():
+        #    strategy.set_config(config)
 
         print(partition)
 
@@ -96,8 +96,8 @@ def TestOneInput(data: bytes) -> None:
         else:
             print("failure")
 
-        for strategy in config["strategy"].values():
-            strategy.shutdown()
+        #for strategy in config["strategy"].values():
+        #    strategy.shutdown()
 
     except Exception:
         pass
