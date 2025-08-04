@@ -65,7 +65,7 @@ class VerapakAdapter(BenchAdapter):
             new_partitions.append(mutated_region)
 
         encoded_partitions=pickle.dumps(new_partitions)
-        print('The returned data size is: '+len(encoded_partitions))
+        print(f'The returned data size is: {len(encoded_partitions)}')
 
         if len(encoded_partitions) <= max_size:
             return encoded_partitions[:max_size]
