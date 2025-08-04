@@ -42,7 +42,7 @@ class VerapakAdapter(BenchAdapter):
 
 
     def mutate(self, data, max_size, seed):
-        
+
         random.seed(seed)
         partitions=self.partitions
         new_partitions=[]
@@ -65,7 +65,7 @@ class VerapakAdapter(BenchAdapter):
             new_partitions.append(mutated_region)
 
         encoded_partitions=pickle.dumps(new_partitions)
-        print(len(encoded_partitions))
+        print('The returned data size is: '+len(encoded_partitions))
 
         if len(encoded_partitions) <= max_size:
             return encoded_partitions[:max_size]

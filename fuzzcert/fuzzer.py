@@ -21,7 +21,26 @@ def strip_fuzzcert_args(argv):
         cleaned.append(arg)
     return cleaned
 
+def falsify_predicate(pre_size: dict, post_size: dict) -> bool:
+    """
+    :param pre_size: The size of each set prior to falsify call
+    :param post_size: The size of each set after call to falsify
+    :return: bool: Checks correctness and returns True/False
+    """
+    total_pre = sum(value for value in pre_size.values())
+    total_post = sum(value for value in post_size.values())
 
+    delta_unk = post_size["UNKNOWN"] - pre_size["UNKNOWN"]
+    delta_someunsafe = post_size["SOME_UNSAFE"] - pre_size["SOME_UNSAFE"]
+
+    total_delta = total_post - total_pre
+
+    # total change should be 1 -> we pulled out a region then place it back after falsify
+    # unknown or some unsafe can grow by 1 but not both at the same time
+    if total_delta == 1 and delta_someunsafe in [0,1] and delta_unk in [0,1] and delta_someunsafe != delta_unk:
+        return True
+    else:
+        return False
 
 def TestOneInput(data: bytes) -> None:
     """
@@ -42,11 +61,29 @@ def TestOneInput(data: bytes) -> None:
 
         sets=g_benchAdapter.sets
 
+        pre_set = {
+            "UNKNOWN": sets[UNKNOWN].set.size(),
+            "SAFE": sets[ALL_SAFE].set.size(),
+            "UNSAFE": sets[ALL_UNSAFE].set.size(),
+            "SOME_UNSAFE": sets[SOME_UNSAFE].queue.qsize()
+        }
+
         for strategy in config["strategy"].values():
             strategy.set_config(config)
 
         for partition in partitions:
             falsify(config,partition,sets['reporter'].get_area(partition),sets,from_=from_)
+
+            post_set = {
+                "UNKNOWN": sets[UNKNOWN].set.size(),
+                "SAFE": sets[ALL_SAFE].set.size(),
+                "UNSAFE": sets[ALL_UNSAFE].set.size(),
+                "SOME_UNSAFE": sets[SOME_UNSAFE].queue.qsize()
+            }
+            if falsify_predicate(pre_set, post_set):
+                print("success")
+            else:
+                print("failure")
 
         for strategy in config["strategy"].values():
             strategy.shutdown()
@@ -54,7 +91,7 @@ def TestOneInput(data: bytes) -> None:
     except Exception:
         pass
 
-    if counter > 10:
+    if counter > 20:
         sys.exit(0)
 
 
