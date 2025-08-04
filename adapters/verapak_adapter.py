@@ -63,7 +63,6 @@ class VerapakAdapter(BenchAdapter):
             break
 
         print(sys.getsizeof(partitions))
-        sys.exit(0)
 
     def serialize(self, data, input_dtype) -> bytes:
         """
