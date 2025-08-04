@@ -93,13 +93,15 @@ def TestOneInput(data: bytes) -> None:
             "SOME_UNSAFE": sets[SOME_UNSAFE].queue.qsize()
         }
 
+        '''
         if falsify_predicate(pre_set, post_set):
             print("success")
         else:
             print("failure")
-
-        #for strategy in config["strategy"].values():
-        #    strategy.shutdown()
+        '''
+        
+        for strategy in config["strategy"].values():
+            strategy.shutdown()
 
     except Exception:
         pass
