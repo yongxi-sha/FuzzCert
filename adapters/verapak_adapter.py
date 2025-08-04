@@ -61,8 +61,8 @@ class VerapakAdapter(BenchAdapter):
             low=partiton[1]
             print(f'partition:{partiton};  high:{high};  low:{low}')
             break
-        
-        sys.getsizeof(partitions)
+
+        print(sys.getsizeof(partitions))
         sys.exit(0)
 
     def serialize(self, data, input_dtype) -> bytes:
