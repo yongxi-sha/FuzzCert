@@ -62,8 +62,7 @@ def TestOneInput(data: bytes) -> None:
 
         # deserialize
         partitions=pickle.loads(data)
-        print(partitions)
-        
+
         config=g_benchAdapter.config_obj
 
         from_=g_benchAdapter.from_
@@ -81,7 +80,9 @@ def TestOneInput(data: bytes) -> None:
             strategy.set_config(config)
 
         for partition in partitions:
-
+            
+            print(partition)
+            
             falsify(config,partition,sets['reporter'].get_area(partition),sets,from_=from_)
 
             post_set = {
