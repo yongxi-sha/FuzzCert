@@ -78,9 +78,9 @@ def TestOneInput(data: bytes) -> None:
             "SOME_UNSAFE": sets[SOME_UNSAFE].queue.qsize()
         }
         '''
-        
-        #for strategy in config["strategy"].values():
-        #    strategy.set_config(config)
+
+        for strategy in config["strategy"].values():
+            strategy.set_config(config)
 
         print(partition)
 
