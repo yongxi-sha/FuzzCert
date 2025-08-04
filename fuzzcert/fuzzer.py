@@ -5,6 +5,14 @@ import pickle
 g_benchAdapter = None
 counter=0
 
+with atheris.instrument_imports():
+    from algorithm import falsify
+    from config import Config
+    from verapak.parse_args.tools import parse_args
+    from verapak.verification.ve import UNKNOWN
+    from verapak.abstraction.ae import AbstractionEngine
+    from algorithm import main, verify
+
 def strip_fuzzcert_args(argv):
     """Remove fuzzcert-specific args that Atheris doesn't understand"""
     cleaned = []
@@ -72,6 +80,7 @@ def TestOneInput(data: bytes) -> None:
             strategy.set_config(config)
 
         for partition in partitions:
+
             falsify(config,partition,sets['reporter'].get_area(partition),sets,from_=from_)
 
             post_set = {
