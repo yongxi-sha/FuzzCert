@@ -11,6 +11,7 @@ from algorithm import falsify
 from verapak.verification.ve import UNKNOWN, ALL_SAFE, ALL_UNSAFE, SOME_UNSAFE
 
 counter=0
+region=None
 
 class VerapakAdapter(BenchAdapter):
     def __init__(self, config):
@@ -19,8 +20,6 @@ class VerapakAdapter(BenchAdapter):
         self.region = None
         self.from_ = None
         self.sets = None
-        self.pre_set=None
-        self.post_set=None
 
     def initialize(self, input_dir=None):
         """
@@ -31,11 +30,11 @@ class VerapakAdapter(BenchAdapter):
             from algorithm import falsify
             from config import Config
             from verapak.parse_args.tools import parse_args
-            
             from verapak.abstraction.ae import AbstractionEngine
             from algorithm import main, verify
 
         # Load VERAPAK config
+        global region
         fuzz_args = config_loader.load_config_from_corpus(input_dir)
         config, region, sets = get_fal_paras(fuzz_args)
         self.config = config
@@ -48,6 +47,7 @@ class VerapakAdapter(BenchAdapter):
             "UNSAFE": len(sets[ALL_UNSAFE]),
             "SOME_UNSAFE": len(sets[SOME_UNSAFE]),
         }
+
 
     def my_mutator(data, max_size, seed):
 
@@ -141,7 +141,6 @@ class VerapakAdapter(BenchAdapter):
             return False
         
     def testoneinput(self, region):
-        global pre_set
         global counter
         counter += 1
         pre_set=self.pre_set
@@ -175,8 +174,6 @@ class VerapakAdapter(BenchAdapter):
                 print("success")
             else:
                 print("failure")
-
-            # pre_set=post_set
 
         except Exception:
             pass
