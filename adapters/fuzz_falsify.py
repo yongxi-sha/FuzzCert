@@ -51,7 +51,7 @@ def falsify_predicate(pre_size, post_size):
 
     total_delta=total_post-total_pre
 
-    if total_delta == 1 and dalta_someunsafe in [0,1] and delta_unk in [0,1] and delta_someunsafe != delta_unk:
+    if total_delta == 1 and delta_someunsafe in [0,1] and delta_unk in [0,1] and delta_someunsafe != delta_unk:
         return True
     else:
         return False
@@ -97,12 +97,13 @@ def TestOneInput(data):
                 "UNSAFE": sets[ALL_UNSAFE].set.size(),
                 "SOME_UNSAFE": sets[SOME_UNSAFE].queue.qsize()        
         }
-
+        
         if falsify_predicate(pre_set, post_set):
             print("success")
         else:
             print("failure")
-
+        pre_set=post_set
+        
     except Exception:
         pass
 
