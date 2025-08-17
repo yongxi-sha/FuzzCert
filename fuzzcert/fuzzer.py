@@ -1,20 +1,12 @@
 import sys
 import atheris
-import pickle
-
 
 g_benchAdapter = None
-counter=0
-
-
 
 def TestOneInput(data: bytes) -> None:
     """
     Atheris fuzzing entry point. Deserializes and runs verifier on input.
     """
-
-    global counter
-    counter+=1
     global g_benchAdapter
     mutated_data=g_benchAdapter.deserialize(data)
     g_benchAdapter.testoneinput(mutated_data)
