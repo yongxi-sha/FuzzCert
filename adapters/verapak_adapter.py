@@ -4,16 +4,15 @@ import numpy as np
 import atheris
 from fuzzcert.bench_adapter import BenchAdapter
 import config_loader
-from falsify_interface2 import *
+from Falsify_Interface import *
 
 
 class VerapakAdapter(BenchAdapter):
     def __init__(self, config):
         super().__init__(config)
-        self.config_obj = None
-        self.partitions = None
+        self.config = None
+        self.region = None
         self.from_ = None
-        self.input_dtype = None
         self.sets = None
 
     def initialize(self, input_dir=None):
@@ -29,81 +28,63 @@ class VerapakAdapter(BenchAdapter):
             from verapak.abstraction.ae import AbstractionEngine
             from algorithm import main, verify
 
-        self.from_ = UNKNOWN
-
         # Load VERAPAK config
         fuzz_args = config_loader.load_config_from_corpus(input_dir)
-        params=get_fal_paras(fuzz_args)
-        config, partitions, sets=params
-        self.config_obj=config
-        self.partitions=partitions
-        self.sets=sets
-        self.input_dtype = self.config_obj['graph'].input_dtype
+        config, region, sets = get_fal_paras(fuzz_args)
+        self.config = config
+        self.region = region
+        self.sets = sets
+        self.from_ = UNKNOWN
 
-
-    def mutate(self, data, max_size, seed):
+    def my_mutator(data, max_size, seed):
 
         random.seed(seed)
-        partitions=self.partitions
-        for partiton in partitions:
-            high=partiton[0]
-            low=partiton[1]
-            ceil = 1
-            floor = 0
 
-            # creates a random float between floor and ceil for each region position
-            random_mod = np.random.uniform(floor, ceil, size=high.shape)
+        mutated_region = region
+        high = region.high
+        low = region.low
+        ceil = 1
+        floor = 0
+        random_mod = np.random.uniform(floor, ceil, size=high.shape)
+        sign = np.random.choice([-1, 1], size=high.shape)
 
-            # randomize sign for each region position (either add or subtract random_mod)
-            sign = np.random.choice([-1, 1], size=high.shape)
+        new_high = high + (sign * random_mod)
+        new_low = low + (sign * random_mod)
 
-            new_high = high + (sign * random_mod)
-            new_low = low + (sign * random_mod)
+        mutated_region.high = new_high
+        mutated_region.low = new_low
 
-            mutated_region = [new_high, new_low, partiton[2:]]
-            break
+        encoded_region = VerapakAdapter.serialize(mutated_region)
 
-        encoded_partitions=pickle.dumps(mutated_region)
-        print(f'The returned data size is: {len(encoded_partitions)}')
-
-        if len(encoded_partitions) <= max_size:
-            return encoded_partitions[:max_size]
+        if len(encoded_region) <= max_size:
+            return encoded_region[:max_size]
         else:
-            raise NotImplementedError("returned data exceed max_len")
-
-    def serialize(self, data, input_dtype) -> bytes:
+            raise NotImplementedError(f"returned encoded_region exceed max_len: {max_size}")
+    
+    @staticmethod
+    def serialize(self, data) -> bytes:
         """
         Serialize a region and area into bytes (for corpus writing).
-        
+
         Args:
             data: A tuple of (region, area), where region is (low, high, ()) and area is float.
             input_dtype: Data type of the region tensors (e.g., np.float32).
-        
+
         Returns:
             bytes: Pickled representation of region+area.
         """
-        region, area = data
-        low, high, _ = region
-        low_list = np.array(low, dtype=input_dtype).tolist()
-        high_list = np.array(high, dtype=input_dtype).tolist()
-        return pickle.dumps(((low_list, high_list), area))
-
-    def deserialize(self, data, input_dtype):
+        return pickle.dumps(data)
+    
+    @staticmethod
+    def deserialize(self, data):
         """
         Deserialize bytes into a region and area.
-        
+
         Args:
             data (bytes): Serialized region/area data.
             input_dtype (type): Expected dtype (e.g., np.float32).
-        
+
         Returns:
             Tuple: (region, area), where region = (low, high, ()), area is float.
         """
-        try:
-            region_data, area = pickle.loads(data)
-            low, high = region_data
-            low = np.array(low, dtype=input_dtype)
-            high = np.array(high, dtype=input_dtype)
-            return (low, high, ()), area
-        except Exception as e:
-            raise ValueError(f"Failed to deserialize input: {e}")
+        return pickle.loads(data)
