@@ -28,7 +28,7 @@ class BenchAdapter(ABC):
         pass
 
     @abstractmethod
-    def mutate(self, base_input: np.ndarray) -> np.ndarray:
+    def my_mutate(self, base_input: np.ndarray) -> np.ndarray:
         """
         Generate a mutated input based on the given base input.
 
@@ -67,3 +67,34 @@ class BenchAdapter(ABC):
             np.ndarray: Reconstructed input array from bytes.
         """
         pass
+    
+    @abstractmethod
+    def strip_fuzzcert_args(self, argv):
+        """
+        clean argv
+
+        Returns:
+            str: cleaned argv.
+        """
+        pass
+
+    @abstractmethod
+    def falsify_predicate(self,pre_size: dict, post_size: dict) -> bool:
+        """
+        compare pre_set and post_set
+
+        Returns:
+            bool: true or false
+        """
+        pass
+
+    @abstractmethod
+    def testoneinput(self, region):
+        """
+        fuzzing logic for VERAPAK falsify
+
+        Returns:
+            None
+        """
+        pass
+
