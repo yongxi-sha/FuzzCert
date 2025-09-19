@@ -15,8 +15,6 @@ from algorithm import main, verify
 cov=coverage.Coverage()
 cov.start()
 
-counter=0
-
 class FalsifyAdapter(FunctionAdapter):
 
     def __init__(self, config, function_name, benchmark_name="verapak"):
@@ -32,20 +30,11 @@ class FalsifyAdapter(FunctionAdapter):
             from algorithm import falsify
 
         # Load VERAPAK config
-        global region
+        self.counter=0
         fuzz_args = load_config_from_corpus(input_dir)
         config, region, sets = get_fal_paras(fuzz_args)
         self.config = config
         self.region = region
-
-        print("---------------------region-high--------------------")
-        print(self.region.high)
-        print("---------------------region-high--------------------")
-        print("***************************************************")
-        print("---------------------region-low--------------------")
-        print(self.region.low)
-        print("---------------------region-low--------------------")
-
         self.sets = sets
         self.from_ = UNKNOWN
         self.pre_set = {
@@ -144,29 +133,36 @@ class FalsifyAdapter(FunctionAdapter):
         delta_someunsafe = post_size["SOME_UNSAFE"] - pre_size["SOME_UNSAFE"]
 
         total_delta = total_post - total_pre
-
-        # total change should be 1 -> we pulled out a region then place it back after falsify
-        # unknown or some unsafe can grow by 1 but not both at the same time
-        if total_delta == 1 and delta_someunsafe in [0,1] and delta_unk in [0,1] and delta_someunsafe != delta_unk:
+        print(f"total delta {total_delta}, total_pre {total_pre}, total_post {total_post}, delta_unk {delta_unk}, delta_someunsafe {delta_someunsafe}")
+        # total change should be 0 -> we put region back into unknown or into some_unknown
+        # if some_unknown grows - unknown should decrease. If not, neither should change (existing set was unknown and gets placed back)
+        if total_delta == 0 and ((delta_someunsafe == 1 and delta_unk == -1) or (delta_someunsafe == 0 and delta_unk == 0)):
             return True
         else:
             return False
+
         
     def testoneinput(self, region):
-        global counter
-        counter += 1
         pre_set=self.pre_set
         try:
+            decoded_region=FalsifyAdapter.deserialize(region=region)
+
+            print("--------------------------region_low-----------------------")
+            print(region.low)
+            print("--------------------------region_low-----------------------")
+            print("--------------------------region_high-----------------------")
+            print(region.high)
+            print("--------------------------region_high-----------------------")
+
             falsify(
                 self.config,
-                region,
+                decoded_region,
                 self.sets["reporter"].get_area(region),
                 self.sets,
                 from_=self.from_,
             )
-            print(counter)
-            # for strategy in config["strategy"].values():
-            #    strategy.shutdown()
+
+            print(self.counter)
 
             post_set = {
                 "UNKNOWN": len(self.sets[UNKNOWN]),
@@ -175,22 +171,18 @@ class FalsifyAdapter(FunctionAdapter):
                 "SOME_UNSAFE": len(self.sets[SOME_UNSAFE]),
             }
 
-            print("########################pre_set###########################")
-            print(pre_set)
-            print("########################pre_set###########################")
-            print("************************post_set*****************************")
-            print(post_set)
-            print("************************post_set*****************************")
-
             if FalsifyAdapter.falsify_predicate(pre_set, post_set):
                 print("success")
             else:
                 print("failure")
 
+            self.counter+=1
+
+
         except Exception:
             pass
 
-        if counter > 10:
+        if self.counter > 10:
             cov.stop()
             cov.save()
             cov.report()
