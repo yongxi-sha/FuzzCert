@@ -7,13 +7,9 @@ def TestOneInput(data: bytes) -> None:
     """
     Atheris fuzzing entry point. Deserializes and runs verifier on input.
     """
-    print("--------------------------data-----------------------")
-    print(data)
-    print("--------------------------data-----------------------")
 
     global g_benchAdapter
-    mutated_data=g_benchAdapter.deserialize(data)
-    g_benchAdapter.testoneinput(mutated_data)
+    g_benchAdapter.testoneinput(data)
 
 
 def start_fuzzing(benchAdapter, corpus_dir: str) -> None:
