@@ -146,10 +146,9 @@ class FalsifyAdapter(FunctionAdapter):
     def testoneinput(self, region):
         global counter
         pre_set=self.pre_set
-        print("-------------------------------region---------------------------------")
-        print(region)
         try:
-            decoded_region=FalsifyAdapter.deserialize(region=region)
+            #decoded_region=FalsifyAdapter.deserialize(region=region)
+            decoded_region=pickle.loads(region)
             print("-------------------------------decoded_region---------------------------------")
             print(decoded_region)
 
