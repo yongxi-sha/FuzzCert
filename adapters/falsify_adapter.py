@@ -37,6 +37,10 @@ class FalsifyAdapter(FunctionAdapter):
         config, region, sets = get_fal_paras(fuzz_args)
         self.config = config
         self.region = region
+        
+        print("---------------------region--------------------")
+        print(self.region)
+
         self.sets = sets
         self.from_ = UNKNOWN
         self.pre_set = {
