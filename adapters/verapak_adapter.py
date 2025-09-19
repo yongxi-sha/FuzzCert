@@ -19,9 +19,8 @@ class VerapakAdapter(BenchAdapter):
     def initialize(self, input_dir=None):
         """
         Initialize model configuration, region, and area info.
-        """
-        if hasattr(self.function_adapter, "initialize"):
-            self.function_adapter.initialize(input_dir=input_dir)
+        """    
+        self.function_adapter.initialize(input_dir=input_dir)
     
     def strip_fuzzcert_args(self, argv):
         """Remove fuzzcert-specific args that Atheris doesn't understand"""
@@ -60,7 +59,7 @@ class VerapakAdapter(BenchAdapter):
         :param post_size: The size of each set after call to falsify
         :return: bool: Checks correctness and returns True/False
         """
-        return self.function_adapter.falsify_predicate(pre_size,post_size)
+        return self.function_adapter.validate_state_transition(pre_size,post_size)
         
     # ---------- fuzzing-facing API (pure delegation) ----------
     def my_mutator(self, data: bytes, max_size: int, seed: int) -> bytes:

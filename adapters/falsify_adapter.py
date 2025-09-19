@@ -122,7 +122,7 @@ class FalsifyAdapter(FunctionAdapter):
         return cleaned
 
     @staticmethod
-    def falsify_predicate(pre_size: dict, post_size: dict) -> bool:
+    def validate_state_transition(pre_size: dict, post_size: dict) -> bool:
         """
         :param pre_size: The size of each set prior to falsify call
         :param post_size: The size of each set after call to falsify
@@ -164,7 +164,7 @@ class FalsifyAdapter(FunctionAdapter):
                 "SOME_UNSAFE": len(self.sets[SOME_UNSAFE]),
             }
 
-            if FalsifyAdapter.falsify_predicate(pre_set, post_set):
+            if FalsifyAdapter.validate_state_transition(pre_set, post_set):
                 print("success")
             else:
                 print("failure")
