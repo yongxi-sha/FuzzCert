@@ -7,7 +7,7 @@ setup(
     description="Fuzzing Framework for Certifiable Robustness of Neural Networks",
     author="Yongxi Sha",
     author_email="yongxi.sha@usu.edu",
-    packages=find_packages(include=["fuzzcert*", "adapters*", "experiments*"]),
+    packages=find_packages(),
     install_requires=[
         # "numpy",
         # "onnx",
