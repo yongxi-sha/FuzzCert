@@ -21,9 +21,7 @@ class FalsifyAdapter(FunctionAdapter):
 
     def __init__(self, config, function_name, benchmark_name="verapak"):
         super().__init__(config, function_name=function_name)
-        self.register_fadapter()
         self.function_name = function_name
-        self.funtionAdapter = self.get_fadapter(function_name)
 
     def initialize(self, input_dir=None):
         """
@@ -35,7 +33,7 @@ class FalsifyAdapter(FunctionAdapter):
 
         # Load VERAPAK config
         global region
-        fuzz_args = load_config_from_corpus.load_config_from_corpus(input_dir)
+        fuzz_args = load_config_from_corpus(input_dir)
         config, region, sets = get_fal_paras(fuzz_args)
         self.config = config
         self.region = region
