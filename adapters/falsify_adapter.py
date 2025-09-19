@@ -13,17 +13,15 @@ from verapak.parse_args.tools import parse_args
 from verapak.abstraction.ae import AbstractionEngine
 from algorithm import main, verify
 
-OUT = Path("experiments/VERAPAK-results")
-OUT.mkdir(parents=True, exist_ok=True)
-
-cov=coverage.Coverage(data_file=str(OUT / ".coverage"))
-cov.start()
-
 class FalsifyAdapter(FunctionAdapter):
 
     def __init__(self, config, function_name, benchmark_name="verapak"):
         super().__init__(config, function_name=function_name)
         self.function_name = function_name
+        self.OUT = Path(f"experiments/{self.function_name}-results")
+        self.OUT.mkdir(parents=True, exist_ok=True)
+        self.cov=coverage.Coverage()
+        self.cov.start()
 
     def initialize(self, input_dir=None):
         """
@@ -178,10 +176,10 @@ class FalsifyAdapter(FunctionAdapter):
             pass
 
         if self.counter > 10:
-            cov.stop()
-            cov.save()
-            with (OUT / "coverage.txt").open("w") as f:
-                cov.report(file=f, show_missing=True)
-            cov.html_report(directory=str(OUT / "html"))
+            self.cov.stop()
+            self.cov.save()
+            with (self.OUT / "coverage.txt").open("w") as f:
+                self.cov.report(file=f, show_missing=True)
+            self.cov.html_report(directory=str(self.OUT / "html"))
             sys.exit(0)
 
