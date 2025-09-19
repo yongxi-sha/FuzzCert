@@ -3,6 +3,7 @@ import random
 import sys
 import numpy as np
 import atheris
+from pathlib import Path
 import coverage
 from Falsify_Interface import *
 from verapak.verification.ve import UNKNOWN, ALL_SAFE, ALL_UNSAFE, SOME_UNSAFE
@@ -12,7 +13,10 @@ from verapak.parse_args.tools import parse_args
 from verapak.abstraction.ae import AbstractionEngine
 from algorithm import main, verify
 
-cov=coverage.Coverage()
+OUT = Path("experiments/VERAPAK-results")
+OUT.mkdir(parents=True, exist_ok=True)
+
+cov=coverage.Coverage(data_file=str(OUT / ".coverage"))
 cov.start()
 
 class FalsifyAdapter(FunctionAdapter):
@@ -176,7 +180,8 @@ class FalsifyAdapter(FunctionAdapter):
         if self.counter > 10:
             cov.stop()
             cov.save()
-            cov.report()
-            cov.html_report()
+            with (OUT / "coverage.txt").open("w") as f:
+                cov.report(file=f, show_missing=True)
+            cov.html_report(directory=str(OUT / "html"))
             sys.exit(0)
 
