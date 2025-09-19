@@ -116,7 +116,6 @@ class FalsifyAdapter(FunctionAdapter):
                 continue
             cleaned.append(arg)
 
-        print(cleaned)
         return cleaned
 
     @staticmethod
@@ -143,16 +142,14 @@ class FalsifyAdapter(FunctionAdapter):
 
         
     def testoneinput(self, region):
+
+        print("--------------------------region-----------------------")
+        print(region)
+        print("--------------------------region-----------------------")
+
         pre_set=self.pre_set
         try:
             decoded_region=FalsifyAdapter.deserialize(region=region)
-
-            print("--------------------------region_low-----------------------")
-            print(region.low)
-            print("--------------------------region_low-----------------------")
-            print("--------------------------region_high-----------------------")
-            print(region.high)
-            print("--------------------------region_high-----------------------")
 
             falsify(
                 self.config,
