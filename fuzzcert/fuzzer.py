@@ -12,8 +12,6 @@ def TestOneInput(data: bytes) -> None:
     g_benchAdapter.testoneinput(mutated_data)
 
 
-
-
 def start_fuzzing(benchAdapter, corpus_dir: str) -> None:
     """
     Initializes benchmark adapter and starts fuzzing with Atheris.

@@ -2,25 +2,22 @@ import sys
 sys.path.append('./adapters')
 sys.path.append('./fuzzcert')
 sys.path.append('./experiments/VERAPAK')
-print(sys.path)
 import argparse
 from adapters.verapak_adapter import VerapakAdapter
 from fuzzer import start_fuzzing
-
-# Registry of supported benchmarks and their adapter classes
-ADAPTERS = {
-    "verapak": VerapakAdapter,
-}
+from adapters.adapters import ADAPTERS
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="FuzzCert: A Lightweight Neural Verifier Fuzzer")
+    parser = argparse.ArgumentParser(description="FuzzCert: A Lightweight Function-level Fuzzer")
 
     parser.add_argument("--bench", required=True, choices=ADAPTERS.keys(),
                         help="Benchmark to fuzz (e.g., verapak)")
+    parser.add_argument("--function", required=True, choices=ADAPTERS.keys(),
+                        help="Function to fuzz (e.g., falsify)")
     parser.add_argument("--input", required=True,
-                        help="Path to input directory or corpus root (adapter-specific)")
+                        help="Path to input directory or corpus directory (function-specific)")
     parser.add_argument("-max_len",required=True,
-                        help="Maximum length of custom_mutator")
+                        help="Maximum input length of custom_mutator")
     return parser.parse_args()
 
 
