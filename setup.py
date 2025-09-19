@@ -1,4 +1,5 @@
-from setuptools import setup, find_namespace_packages
+from setuptools import setup, find_packages
+
 
 setup(
     name="FuzzCert",
@@ -6,7 +7,7 @@ setup(
     description="Fuzzing Framework for Certifiable Robustness of Neural Networks",
     author="Yongxi Sha",
     author_email="yongxi.sha@usu.edu",
-    packages=find_namespace_packages(include=["experiments.*", "adapters.*", "fuzzcert.*"]),
+    packages=find_packages(include=["fuzzcert*", "adapters*", "experiments*"]),
     install_requires=[
         # "numpy",
         # "onnx",
