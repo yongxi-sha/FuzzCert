@@ -116,6 +116,8 @@ class FalsifyAdapter(FunctionAdapter):
             if arg.startswith("--bench=") or arg.startswith("--input=") or arg.startswith("--config=") or arg.startswith("--function="):
                 continue
             cleaned.append(arg)
+            
+        print(cleaned)
         return cleaned
 
     @staticmethod
