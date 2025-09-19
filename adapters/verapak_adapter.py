@@ -4,27 +4,17 @@ class VerapakAdapter(BenchAdapter):
 
     def __init__(self, config, function_name, benchmark_name="verapak"):
         super().__init__(config, function_name=function_name)
-        
-        self.register_fadapter()
         self.function_name = function_name
-        
         FadapterClass = self.get_fadapter(function_name)
         if FadapterClass is None:
             raise ValueError(f"No function adapter registered for '{function_name}'")
-        
         self.function_adapter = FadapterClass(config, function_name, benchmark_name=benchmark_name)
 
-    def get_fadapter(self, function_name):
-        
-        return self.fadapters.get(function_name)
 
     def register_fadapter(self):
         
         from falsify_adapter import FalsifyAdapter
-        self.fadapters = {
-            # Add function name -> AdapterClass mapping here
-            "falsify": FalsifyAdapter,
-        }
+        self.add_fadapter("falsify",FalsifyAdapter)
 
     def initialize(self, input_dir=None):
         """

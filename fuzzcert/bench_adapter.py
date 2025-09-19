@@ -98,6 +98,7 @@ class FunctionAdapter (ABC):
             None
         """
         pass
+    
 
 
 class BenchAdapter(ABC):
@@ -117,6 +118,21 @@ class BenchAdapter(ABC):
         self.config = config
         self.function_name = function_name
         self.benchmark_name = benchmark_name
+        self.fadapters = {}
+        self.register_fadapter()
+    
+
+    def get_fadapter(self, function_name):
+        
+        return self.fadapters.get(function_name)
+    
+    def add_fadapter(self, function_name, fadapter):
+        self.fadapters[function_name]=fadapter
+
+    @abstractmethod
+    def register_fadapter(self):
+        
+        pass
 
     @abstractmethod
     def initialize(self) -> None:
