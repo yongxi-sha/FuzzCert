@@ -20,7 +20,7 @@ counter=0
 class FalsifyAdapter(FunctionAdapter):
 
     def __init__(self, config, function_name, benchmark_name="verapak"):
-        super().__init__(config)
+        super().__init__(config, function_name=function_name)
         self.register_fadapter()
         self.function_name = function_name
         self.funtionAdapter = self.get_fadapter(function_name)

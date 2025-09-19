@@ -3,7 +3,7 @@ from fuzzcert.bench_adapter import BenchAdapter
 class VerapakAdapter(BenchAdapter):
 
     def __init__(self, config, function_name, benchmark_name="verapak"):
-        super().__init__(config)
+        super().__init__(config, function_name=function_name)
         # 延迟在 register_fadapter 中导入具体的 function adapter class
         self.register_fadapter()
         self.function_name = function_name
