@@ -96,7 +96,7 @@ Current path: region = g_benchAdapter.deserialize(data) → g_benchAdapter.testo
 
 
 ## Coverage output to a specific directory
-The default output file is experiments/``function_name``-results
+The default output file is ``experiments/function_name-results``
 You can also modify the output path in ``adapters/falsify_adapter.py``:
 ```
 from pathlib import Path
