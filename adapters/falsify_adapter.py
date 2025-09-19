@@ -29,7 +29,8 @@ class FalsifyAdapter(FunctionAdapter):
         """
         # Atheris import instrumentation
         with atheris.instrument_imports():
-            from algorithm import falsify
+            from algorithm import falsify as _falsify
+        self._falsify=_falsify
 
         # Load VERAPAK config
 
@@ -149,11 +150,11 @@ class FalsifyAdapter(FunctionAdapter):
         try:
             #decoded_region=FalsifyAdapter.deserialize(region=region)
             decoded_region=pickle.loads(region)
-            
-            falsify(
+
+            self._falsify(
                 self.config,
                 decoded_region,
-                self.sets["reporter"].get_area(region),
+                self.sets["reporter"].get_area(self.region),
                 self.sets,
                 from_=self.from_,
             )
