@@ -127,7 +127,7 @@ class BenchAdapter(ABC):
         pass
 
     @abstractmethod
-    def my_mutate(self, base_input: np.ndarray) -> np.ndarray:
+    def my_mutator(self, data: bytes, max_size: int, seed: int) -> bytes:
         """
         Generate a mutated input based on the given base input.
 

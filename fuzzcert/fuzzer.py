@@ -29,7 +29,7 @@ def start_fuzzing(benchAdapter, corpus_dir: str) -> None:
     atheris.Setup(
         cleaned_argv,
         TestOneInput,
-        custom_mutator=benchAdapter.mutate,
+        custom_mutator=benchAdapter.my_mutator,
         enable_python_coverage=True,
     )
     atheris.Fuzz()
