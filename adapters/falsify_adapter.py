@@ -29,7 +29,7 @@ class FalsifyAdapter(FunctionAdapter):
         with atheris.instrument_imports():
             from algorithm import falsify as _falsify
         self._falsify=_falsify
-        self.counter=0
+        self.counter=1
         # Load VERAPAK config
 
         fuzz_args = load_config_from_corpus(input_dir)

@@ -1,7 +1,3 @@
-import sys
-sys.path.append('./adapters')
-sys.path.append('./fuzzcert')
-sys.path.append('./experiments/VERAPAK')
 import argparse
 from fuzzer import start_fuzzing
 from adapters.adapters import ADAPTERS
