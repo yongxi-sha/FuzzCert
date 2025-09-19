@@ -3,7 +3,7 @@ sys.path.append('./adapters')
 sys.path.append('./fuzzcert')
 sys.path.append('./experiments/VERAPAK')
 import argparse
-from adapters.verapak_adapter import VerapakAdapter
+from bench_adapter import BenchAdapter
 from fuzzer import start_fuzzing
 from adapters.adapters import ADAPTERS
 
@@ -24,7 +24,8 @@ def parse_args():
 def main():
     args = parse_args()
     AdapterClass = ADAPTERS[args.bench]
-    adapter = AdapterClass(args)
+    #adapter = AdapterClass(args)
+    adapter = BenchAdapter(args)
     start_fuzzing(adapter, args.input)
 
 

@@ -1,9 +1,9 @@
-from verapak_adapter import VerapakAdapter
+from falsify_adapter import FalsifyAdapter
 
 ADAPTERS = {
 """
     Add benchmark name here
     format: "benchmark name": 
 """
-    "verapak": VerapakAdapter,
+    "falsify": FalsifyAdapter,
 }
