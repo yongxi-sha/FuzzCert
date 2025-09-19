@@ -110,10 +110,10 @@ class FalsifyAdapter(FunctionAdapter):
             if skip_next:
                 skip_next = False
                 continue
-            if arg in ("--bench", "--input", "--config"):
+            if arg in ("--bench", "--input", "--config", "--function"):
                 skip_next = True  # Skip next argument (e.g., value after --bench)
                 continue
-            if arg.startswith("--bench=") or arg.startswith("--input=") or arg.startswith("--config="):
+            if arg.startswith("--bench=") or arg.startswith("--input=") or arg.startswith("--config=") or arg.startswith("--function="):
                 continue
             cleaned.append(arg)
         return cleaned
