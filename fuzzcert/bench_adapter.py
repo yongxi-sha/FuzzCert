@@ -70,7 +70,7 @@ class FunctionAdapter (ABC):
         pass
     
     @abstractmethod
-    def strip_fuzzcert_args(self, argv):
+    def strip_fuzzcert_args(argv):
         """
         clean argv
 
@@ -168,7 +168,7 @@ class BenchAdapter(ABC):
         pass
     
     @abstractmethod
-    def strip_fuzzcert_args(self, argv):
+    def strip_fuzzcert_args(argv):
         """
         clean argv
 
