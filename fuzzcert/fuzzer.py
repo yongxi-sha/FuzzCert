@@ -24,7 +24,6 @@ def start_fuzzing(benchAdapter, corpus_dir: str) -> None:
     benchAdapter.initialize(corpus_dir)
     g_benchAdapter = benchAdapter
     cleaned_argv=benchAdapter.strip_fuzzcert_args(sys.argv)
-    print(cleaned_argv)
     # Use adapter’s own custom_mutator
     atheris.Setup(
         cleaned_argv,
