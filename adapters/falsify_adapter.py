@@ -145,11 +145,12 @@ class FalsifyAdapter(FunctionAdapter):
         
     def testoneinput(self, region):
         global counter
-        print(counter)
         pre_set=self.pre_set
         try:
             decoded_region=FalsifyAdapter.deserialize(region=region)
-
+            print("-------------------------------decoded_region---------------------------------")
+            print(decoded_region)
+            
             falsify(
                 self.config,
                 decoded_region,
