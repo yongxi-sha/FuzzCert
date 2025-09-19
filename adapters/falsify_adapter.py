@@ -15,6 +15,8 @@ from algorithm import main, verify
 cov=coverage.Coverage()
 cov.start()
 
+counter=0
+
 class FalsifyAdapter(FunctionAdapter):
 
     def __init__(self, config, function_name, benchmark_name="verapak"):
@@ -30,7 +32,7 @@ class FalsifyAdapter(FunctionAdapter):
             from algorithm import falsify
 
         # Load VERAPAK config
-        self.counter=0
+
         fuzz_args = load_config_from_corpus(input_dir)
         config, region, sets = get_fal_paras(fuzz_args)
         self.config = config
@@ -142,7 +144,8 @@ class FalsifyAdapter(FunctionAdapter):
 
         
     def testoneinput(self, region):
-        print(self.counter)
+        global counter
+        print(counter)
         pre_set=self.pre_set
         try:
             decoded_region=FalsifyAdapter.deserialize(region=region)
@@ -169,13 +172,13 @@ class FalsifyAdapter(FunctionAdapter):
             else:
                 print("failure")
 
-            self.counter+=1
+            counter+=1
 
 
         except Exception:
             pass
 
-        if self.counter > 10:
+        if counter > 10:
             cov.stop()
             cov.save()
             cov.report()
