@@ -12,7 +12,7 @@ def parse_args():
 
     parser.add_argument("--bench", required=True, choices=ADAPTERS.keys(),
                         help="Benchmark to fuzz (e.g., verapak)")
-    parser.add_argument("--function", required=True, choices=ADAPTERS.keys(),
+    parser.add_argument("--function", required=True,
                         help="Function to fuzz (e.g., falsify)")
     parser.add_argument("--input", required=True,
                         help="Path to input directory or corpus directory (function-specific)")
@@ -23,6 +23,7 @@ def parse_args():
 
 def main():
     args = parse_args()
+    print(args)
     AdapterClass = ADAPTERS[args.bench]
     #adapter = AdapterClass(args)
     adapter = BenchAdapter(args)
