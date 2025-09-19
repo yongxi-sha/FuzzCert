@@ -61,6 +61,7 @@ class VerapakAdapter(BenchAdapter):
         Returns:
             Tuple: (region, area), where region = (low, high, ()), area is float.
         """
+        
         return self.function_adapter.deserialize(data)
     
     def falsify_predicate(self, pre_size: dict, post_size: dict) -> bool:
