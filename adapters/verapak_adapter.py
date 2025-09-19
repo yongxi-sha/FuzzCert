@@ -4,14 +4,14 @@ class VerapakAdapter(BenchAdapter):
 
     def __init__(self, config, function_name, benchmark_name="verapak"):
         super().__init__(config, function_name=function_name)
-        # 延迟在 register_fadapter 中导入具体的 function adapter class
+        
         self.register_fadapter()
         self.function_name = function_name
-        # 获取 function adapter class（不一定要立即实例化——根据需要）
+        
         FadapterClass = self.get_fadapter(function_name)
         if FadapterClass is None:
             raise ValueError(f"No function adapter registered for '{function_name}'")
-        # 这里创建函数级适配器实例（传入必要参数：config, function_name, benchmark_name）
+        
         self.function_adapter = FadapterClass(config, function_name, benchmark_name=benchmark_name)
 
     def get_fadapter(self, function_name):
@@ -19,7 +19,7 @@ class VerapakAdapter(BenchAdapter):
         return self.fadapters.get(function_name)
 
     def register_fadapter(self):
-        # 局部导入以避免循环导入
+        
         from falsify_adapter import FalsifyAdapter
         self.fadapters = {
             # Add function name -> AdapterClass mapping here

@@ -15,8 +15,6 @@ from algorithm import main, verify
 cov=coverage.Coverage()
 cov.start()
 
-counter=0
-
 class FalsifyAdapter(FunctionAdapter):
 
     def __init__(self, config, function_name, benchmark_name="verapak"):
@@ -31,7 +29,7 @@ class FalsifyAdapter(FunctionAdapter):
         with atheris.instrument_imports():
             from algorithm import falsify as _falsify
         self._falsify=_falsify
-
+        self.counter=0
         # Load VERAPAK config
 
         fuzz_args = load_config_from_corpus(input_dir)
@@ -145,10 +143,8 @@ class FalsifyAdapter(FunctionAdapter):
 
         
     def testoneinput(self, region):
-        global counter
         pre_set=self.pre_set
         try:
-            #decoded_region=FalsifyAdapter.deserialize(region=region)
             decoded_region=pickle.loads(region)
 
             self._falsify(
@@ -171,13 +167,13 @@ class FalsifyAdapter(FunctionAdapter):
             else:
                 print("failure")
 
-            counter+=1
+            self.counter+=1
 
 
         except Exception:
             pass
 
-        if counter > 10:
+        if self.counter > 10:
             cov.stop()
             cov.save()
             cov.report()
