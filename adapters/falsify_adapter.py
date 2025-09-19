@@ -15,7 +15,7 @@ region=None
 
 class FalsifyAdapter(FunctionAdapter):
 
-    def __init__(self, config, function_name, benchmark_name=verapak):
+    def __init__(self, config, function_name, benchmark_name="verapak"):
         super().__init__(config)
         self.register_fadapter()
         self.function_name = function_name
