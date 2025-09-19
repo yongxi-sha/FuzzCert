@@ -140,7 +140,7 @@ class BenchAdapter(ABC):
         pass
 
     @abstractmethod
-    def serialize(self, data: np.ndarray, input_dtype: Union[type, str]) -> bytes:
+    def serialize(self, data):
         """
         Serialize an input (e.g., float array) into bytes for Atheris fuzzing.
 
@@ -154,7 +154,7 @@ class BenchAdapter(ABC):
         pass
 
     @abstractmethod
-    def deserialize(self, data: bytes, input_dtype: Union[type, str]) -> np.ndarray:
+    def deserialize(self, data):
         """
         Deserialize a byte stream back into an input array.
 
