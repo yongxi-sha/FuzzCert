@@ -1,10 +1,11 @@
 import argparse
 import sys
+from fuzzer import start_fuzzing
+from adapters.adapters import ADAPTERS
+
 sys.path.append('./adapters') 
 sys.path.append('./fuzzcert') 
 sys.path.append('./experiments/VERAPAK')
-from fuzzer import start_fuzzing
-from adapters.adapters import ADAPTERS
 
 def parse_args():
     parser = argparse.ArgumentParser(description="FuzzCert: A Lightweight Function-level Fuzzer")
