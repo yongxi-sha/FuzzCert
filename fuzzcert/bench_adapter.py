@@ -107,7 +107,7 @@ class BenchAdapter(ABC):
     implement all abstract methods.
     """
 
-    def __init__(self, config: Any, function_name, benchmark_name=verapak):
+    def __init__(self, config: Any, function_name, benchmark_name="verapak"):
         """
         Initialize the adapter with a parsed configuration object.
 
