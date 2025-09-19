@@ -77,8 +77,6 @@ validate_state_transition(pre, post) — (formerly falsify_predicate) checks pos
 
 testoneinput(obj) — evaluates one input (object), updates sets, checks invariants.
 
-(Optional, recommended) test_one_input_bytes(data: bytes) — convenience entry for Atheris: bytes -> deserialize -> testoneinput.
-
 ### (2) Fuzzer (Atheris)
 fuzzcert/fuzzer.py
 
