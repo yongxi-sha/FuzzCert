@@ -31,7 +31,7 @@ pip install .
 ```
 
 ## Quick start
-Prepare and copy the VERAPAK to ``experiments/VERAPAK``, then run:
+Compile and copy the VERAPAK to ``experiments/VERAPAK``, then run:
 ```
 fuzzcert --bench verapak --function falsify --input experiments/VERAPAK/corpus --max_len 60000
 ```
