@@ -8,9 +8,9 @@ setup(
     author_email="your.email@example.com",
     packages=find_packages(),
     install_requires=[
-        "numpy",
-        "onnx",
-        "tqdm",
+        # "numpy",
+        # "onnx",
+        # "tqdm",
     ],
     entry_points={
         "console_scripts": [
