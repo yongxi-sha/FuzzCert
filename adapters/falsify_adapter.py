@@ -102,6 +102,7 @@ class FalsifyAdapter(FunctionAdapter):
         """
         return pickle.loads(data)
     
+    @staticmethod
     def strip_fuzzcert_args(argv):
         """Remove fuzzcert-specific args that Atheris doesn't understand"""
         cleaned = []
@@ -116,7 +117,7 @@ class FalsifyAdapter(FunctionAdapter):
             if arg.startswith("--bench=") or arg.startswith("--input=") or arg.startswith("--config=") or arg.startswith("--function="):
                 continue
             cleaned.append(arg)
-            
+
         print(cleaned)
         return cleaned
 
