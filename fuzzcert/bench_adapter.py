@@ -80,7 +80,7 @@ class FunctionAdapter (ABC):
         pass
 
     @abstractmethod
-    def falsify_predicate(self,pre_size: dict, post_size: dict) -> bool:
+    def validate_state_transition(self,pre_size: dict, post_size: dict) -> bool:
         """
         compare pre_set and post_set
 
