@@ -55,8 +55,9 @@ adapters/verapak_adapter.py (Bench layer, thin)
 Registers function-level adapters with delayed import (to avoid circular imports):
 ```
 def register_fadapter(self):
-    from .falsify_adapter import FalsifyAdapter       # local import
-    self.fadapters = {"falsify": FalsifyAdapter}
+    
+    from falsify_adapter import FalsifyAdapter
+    self.add_fadapter("falsify",FalsifyAdapter)
 ```
 Delegates initialize, my_mutator, testoneinput to self.function_adapter.
 
