@@ -1,10 +1,4 @@
-import pickle
-import random
-import sys
-import numpy as np
-import atheris
 from fuzzcert.bench_adapter import BenchAdapter
-import cov
 
 class VerapakAdapter(BenchAdapter):
 
