@@ -45,15 +45,15 @@ class FalsifyAdapter(FunctionAdapter):
         }
 
 
-    def my_mutator(data, max_size, seed):
+    def my_mutator(self, data, max_size, seed):
         
         # funtion-level mutator
 
         random.seed(seed)
 
-        mutated_region = region
-        high=region.high
-        low=region.low
+        mutated_region = self.region
+        high=self.region.high
+        low=self.region.low
         ceil = 1
         floor = 0
         random_mod = np.random.uniform(floor, ceil, size=high.shape)
