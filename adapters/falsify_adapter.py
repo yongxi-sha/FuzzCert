@@ -3,8 +3,6 @@ import random
 import sys
 import numpy as np
 import atheris
-from fuzzcert.bench_adapter import BenchAdapter
-import config_loader
 import cov
 from Falsify_Interface import *
 from verapak.verification.ve import UNKNOWN, ALL_SAFE, ALL_UNSAFE, SOME_UNSAFE
@@ -35,7 +33,7 @@ class FalsifyAdapter(FunctionAdapter):
 
         # Load VERAPAK config
         global region
-        fuzz_args = config_loader.load_config_from_corpus(input_dir)
+        fuzz_args = load_config_from_corpus.load_config_from_corpus(input_dir)
         config, region, sets = get_fal_paras(fuzz_args)
         self.config = config
         self.region = region

@@ -4,7 +4,6 @@ import sys
 import numpy as np
 import atheris
 from fuzzcert.bench_adapter import BenchAdapter
-import config_loader
 import cov
 
 class VerapakAdapter(BenchAdapter):
