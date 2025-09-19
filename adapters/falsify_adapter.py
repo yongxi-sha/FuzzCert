@@ -158,8 +158,6 @@ class FalsifyAdapter(FunctionAdapter):
                 from_=self.from_,
             )
 
-            print(self.counter)
-
             post_set = {
                 "UNKNOWN": len(self.sets[UNKNOWN]),
                 "SAFE": len(self.sets[ALL_SAFE]),
