@@ -15,7 +15,7 @@ class VerapakAdapter(BenchAdapter):
         self.function_adapter = FadapterClass(config, function_name, benchmark_name=benchmark_name)
 
     def get_fadapter(self, function_name):
-        """返回注册表中对应的函数级 Adapter 类（或 None）"""
+        
         return self.fadapters.get(function_name)
 
     def register_fadapter(self):
