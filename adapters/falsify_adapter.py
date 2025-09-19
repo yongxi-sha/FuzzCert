@@ -149,9 +149,7 @@ class FalsifyAdapter(FunctionAdapter):
         try:
             #decoded_region=FalsifyAdapter.deserialize(region=region)
             decoded_region=pickle.loads(region)
-            print("-------------------------------decoded_region---------------------------------")
-            print(decoded_region)
-
+            
             falsify(
                 self.config,
                 decoded_region,
