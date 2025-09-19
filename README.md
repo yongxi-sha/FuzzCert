@@ -124,7 +124,8 @@ cov.html_report(directory=str(OUT / "html"))
 ## A practical guide to writing a new function-level adapter
 This guide explains how to add a new function-level adapter (the component that implements the actual fuzz target logic) and wire it into the existing bench-level manager (e.g., VerapakAdapter). It assumes your repo already builds/installs and the fuzzcert CLI works.
 
-(1) Create ``adapters/<yourfunc>_adapter.py`` and implement a class that inherits FunctionAdapter (or BenchAdapter if you kept a single abstract base):
+### (1) Create function-level adapter
+Create ``adapters/<yourfunc>_adapter.py`` and implement a class that inherits FunctionAdapter (or BenchAdapter if you kept a single abstract base):
 
 The template is ``adapters/falsify_adapter.py``:
 ```
@@ -173,7 +174,7 @@ Please **DO NOT** change the method signatures defined in the template.
 
 You need to customize the ``initialization``, ``custom_mutator`` and ``testoneinput``. If you do not need to use ``falsify_predicate`` when fuzzing other functions, use ``pass`` to skip this method. 
 
-(2) Register the adapter in the bench manager
+### (2) Register the adapter in the bench manager
 
 Open the bench manager (``adapters/verapak_adapter.py``) and add your mapping inside its delayed registration method:
 
@@ -195,7 +196,7 @@ ADAPTERS = {
   # "mybench": MyBenchAdapter,
 }
 ```
-(3) Run it
+### (3) Reinstall & Run
 
 Reinstall and run:
 ```
