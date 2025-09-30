@@ -16,7 +16,8 @@ FuzzCert/
 │  └─ falsify_adapter.py         # Function-level adapter for "falsify"
 ├─ fuzzcert/
 │  ├─ main.py                    # CLI entry (console_script: fuzzcert)
-│  └─ fuzzer.py                  # Atheris integration (Setup/TestOneInput)
+│  ├─ fuzzer.py                  # Atheris integration (Setup/TestOneInput)
+│  └─ bench_adapter.py           # Abstract base class of benchmark-level and function-level adapter
 ├─ experiments/
 │  └─ VERAPAK/                   # Experiment code & corpus (your project-specific code)
 ├─ setup.py                      # Packaging config
@@ -27,6 +28,7 @@ FuzzCert/
 
 ## Installation
 ```
+pip install atheris
 pip install .
 ```
 
