@@ -32,6 +32,11 @@ class FalsifyAdapter(FunctionAdapter):
             from algorithm import falsify as _falsify
         self._falsify=_falsify
         self.counter=1
+
+        # store failed inputs to use for mutation
+        self.fail_pool=[]
+        # max size of fail pool
+        self.max_pool=512
         # Load VERAPAK config
 
         fuzz_args = load_config_from_corpus(input_dir)
@@ -52,9 +57,15 @@ class FalsifyAdapter(FunctionAdapter):
         
         # funtion-level mutator
 
-        random.seed(seed)
+        rnd=random.seed(seed)
 
         mutated_region = self.region
+        # 70% chance to use a failed input for mutation
+        if self.fail_pool and random.random() < 0.7:
+            mutated_region = rnd.choice(self.fail_pool)
+        else:
+            mutated_region = self.region
+
         high=self.region.high
         low=self.region.low
         ceil = 1
@@ -168,6 +179,12 @@ class FalsifyAdapter(FunctionAdapter):
                 print("success")
             else:
                 print("failure")
+                # add to fail pool
+                if len(self.fail_pool) < self.max_pool:
+                    self.fail_pool.append(decoded_region)
+                else:
+                    # replace old input with new one to keep size constant
+                    self.fail_pool[random.randrange(self.max_pool)] = decoded_region
 
             self.counter+=1
 
