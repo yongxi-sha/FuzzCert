@@ -192,7 +192,7 @@ class FalsifyAdapter(FunctionAdapter):
         except Exception:
             pass
 
-        if self.counter > 10:
+        if self.counter > 10000000:
             self.cov.stop()
             self.cov.save()
             with (self.OUT / "coverage.txt").open("w") as f:
