@@ -57,12 +57,12 @@ class FalsifyAdapter(FunctionAdapter):
         
         # funtion-level mutator
 
-        rnd=random.seed(seed)
+        random.seed(seed)
 
         mutated_region = self.region
         # 70% chance to use a failed input for mutation
         if self.fail_pool and random.random() < 0.7:
-            mutated_region = rnd.choice(self.fail_pool)
+            mutated_region = random.choice(self.fail_pool)
         else:
             mutated_region = self.region
 
