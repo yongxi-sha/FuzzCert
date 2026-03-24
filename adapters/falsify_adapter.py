@@ -1,6 +1,7 @@
 import pickle
 import random
 import sys
+import copy
 import numpy as np
 import atheris
 from pathlib import Path
@@ -54,27 +55,38 @@ class FalsifyAdapter(FunctionAdapter):
 
 
     def my_mutator(self, data, max_size, seed):
-        
+
         # funtion-level mutator
 
-        random.seed(seed)
+        rnd=random.Random(seed)
 
-        mutated_region = self.region
         # 70% chance to use a failed input for mutation
-        if self.fail_pool and random.random() < 0.7:
-            mutated_region = random.choice(self.fail_pool)
+        if self.fail_pool and rnd.random() < 0.7:
+            base_region = rnd.choice(self.fail_pool)
         else:
-            mutated_region = self.region
+            base_region = self.region
 
-        high=self.region.high
-        low=self.region.low
+        mutated_region = copy.deepcopy(base_region)
+
+        high=mutated_region.high
+        low=mutated_region.low
+
         ceil = 1
         floor = 0
         random_mod = np.random.uniform(floor, ceil, size=high.shape)
         sign = np.random.choice([-1, 1], size=high.shape)
+        delta = sign * random_mod
 
-        new_high = high + (sign * random_mod)
-        new_low = low + (sign * random_mod)
+        new_high = high + delta
+        new_low = low + delta
+
+        if new_high.shape != new_low.shape:
+            print("Shape mismatch between new low and new high")
+            sys.exit(0)
+
+        # ensure the low is the low and high is the high - never get flipped/invalid regions
+        low = np.minimum(new_low, new_high)
+        high = np.maximum(new_low, new_high)
 
         mutated_region.high = new_high
         mutated_region.low = new_low
@@ -85,7 +97,7 @@ class FalsifyAdapter(FunctionAdapter):
             return encoded_region[:max_size]
         else:
             raise NotImplementedError(f"returned encoded_region exceed max_len: {max_size}")
-    
+
     @staticmethod
     def serialize(data) -> bytes:
         """
@@ -99,7 +111,7 @@ class FalsifyAdapter(FunctionAdapter):
             bytes: Pickled representation of region+area.
         """
         return pickle.dumps(data)
-    
+
     @staticmethod
     def deserialize(data):
         """
@@ -113,7 +125,7 @@ class FalsifyAdapter(FunctionAdapter):
             Tuple: (region, area), where region = (low, high, ()), area is float.
         """
         return pickle.loads(data)
-    
+
     @staticmethod
     def strip_fuzzcert_args(argv):
         """Remove fuzzcert-specific args that Atheris doesn't understand"""
@@ -147,16 +159,15 @@ class FalsifyAdapter(FunctionAdapter):
 
         total_delta = total_post - total_pre
         print(f"total delta {total_delta}, total_pre {total_pre}, total_post {total_post}, delta_unk {delta_unk}, delta_someunsafe {delta_someunsafe}")
-        # total change should be 0 -> we put region back into unknown or into some_unknown
-        # if some_unknown grows - unknown should decrease. If not, neither should change (existing set was unknown and gets placed back)
-        if total_delta == 0 and ((delta_someunsafe == 1 and delta_unk == -1) or (delta_someunsafe == 0 and delta_unk == 0)):
+        # total change should be 1 -> we either increase unknown by 1 or some_unsafe by 1 - never both - but always 1
+        if total_delta == 1 and ((delta_someunsafe == 1 and delta_unk == 0) or (delta_someunsafe == 0 and delta_unk == 1)):
             return True
         else:
             return False
 
-        
+
     def testoneinput(self, region):
-        pre_set=self.pre_set
+        pre_set = self.pre_set
         try:
             decoded_region=pickle.loads(region)
 
@@ -174,11 +185,13 @@ class FalsifyAdapter(FunctionAdapter):
                 "UNSAFE": len(self.sets[ALL_UNSAFE]),
                 "SOME_UNSAFE": len(self.sets[SOME_UNSAFE]),
             }
+            self.pre_set = post_set
 
             if FalsifyAdapter.validate_state_transition(pre_set, post_set):
                 print("success")
             else:
                 print("failure")
+
                 # add to fail pool
                 if len(self.fail_pool) < self.max_pool:
                     self.fail_pool.append(decoded_region)
@@ -188,15 +201,13 @@ class FalsifyAdapter(FunctionAdapter):
 
             self.counter+=1
 
-
         except Exception:
             pass
 
-        if self.counter > 1000:
+        if self.counter > 10000:
             self.cov.stop()
             self.cov.save()
             with (self.OUT / "coverage.txt").open("w") as f:
                 self.cov.report(file=f, show_missing=True)
             self.cov.html_report(directory=str(self.OUT / "html"))
             sys.exit(0)
-
