@@ -89,6 +89,12 @@ class FunctionAdapter (ABC):
         """
         pass
 
+    
+    @abstractmethod
+    def get_atheris_corpus_dir(self):
+        """Return the normalized corpus directory used by Atheris."""
+        pass
+
     @abstractmethod
     def testoneinput(self, region):
         """
@@ -192,6 +198,13 @@ class BenchAdapter(ABC):
             str: cleaned argv.
         """
         pass
+
+    
+    @abstractmethod
+    def get_atheris_corpus_dir(self):
+        """Return the normalized corpus directory used by Atheris."""
+        pass
+
 
     @abstractmethod
     def validate_state_transition(self,pre_size: dict, post_size: dict) -> bool:

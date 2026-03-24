@@ -60,7 +60,13 @@ class VerapakAdapter(BenchAdapter):
         :return: bool: Checks correctness and returns True/False
         """
         return self.function_adapter.validate_state_transition(pre_size,post_size)
-        
+
+
+    def get_atheris_corpus_dir(self):
+        return self.function_adapter.get_atheris_corpus_dir()
+
+
+
     # ---------- fuzzing-facing API (pure delegation) ----------
     def my_mutator(self, data: bytes, max_size: int, seed: int) -> bytes:
         """

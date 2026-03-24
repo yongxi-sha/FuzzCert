@@ -14,6 +14,10 @@ from verapak.parse_args.tools import parse_args
 from verapak.abstraction.ae import AbstractionEngine
 from algorithm import main, verify
 
+class InvalidStateTransitionError(Exception):
+    """Raised when validate_state_transition() returns False."""
+    pass
+
 class FalsifyAdapter(FunctionAdapter):
 
     def __init__(self, config, function_name, benchmark_name="verapak"):
@@ -23,6 +27,7 @@ class FalsifyAdapter(FunctionAdapter):
         self.OUT.mkdir(parents=True, exist_ok=True)
         self.cov=coverage.Coverage()
         self.cov.start()
+
 
     def initialize(self, input_dir=None):
         """
@@ -34,10 +39,6 @@ class FalsifyAdapter(FunctionAdapter):
         self._falsify=_falsify
         self.counter=1
 
-        # store failed inputs to use for mutation
-        self.fail_pool=[]
-        # max size of fail pool
-        self.max_pool=512
         # Load VERAPAK config
 
         fuzz_args = load_config_from_corpus(input_dir)
@@ -53,18 +54,35 @@ class FalsifyAdapter(FunctionAdapter):
             "SOME_UNSAFE": len(sets[SOME_UNSAFE]),
         }
 
+        # Create a dedicated corpus directory for Atheris.
+        self.atheris_corpus_dir = self.OUT / "atheris_region_corpus"
+        self.atheris_corpus_dir.mkdir(parents=True, exist_ok=True)
+
+        # Write the initial serialized region seed.
+        seed_path = self.atheris_corpus_dir / "seed_region.pkl"
+        with seed_path.open("wb") as f:
+            pickle.dump(copy.deepcopy(self.region), f)
+
+        # File used to store the decoded region that triggers an invalid transition.
+        self.failure_region_path = self.OUT / "invalid_transition_decoded_region.pkl"
+
+    def get_atheris_corpus_dir(self):
+        """Return the normalized corpus directory used by Atheris."""
+        return str(self.atheris_corpus_dir)
+
+    def save_failing_decoded_region(self, decoded_region):
+        """Save the decoded failing region object to a fixed file."""
+        self.failure_region_path.parent.mkdir(parents=True, exist_ok=True)
+        with self.failure_region_path.open("wb") as f:
+            pickle.dump(decoded_region, f)
 
     def my_mutator(self, data, max_size, seed):
 
-        # funtion-level mutator
-
-        rnd=random.Random(seed)
-
-        # 70% chance to use a failed input for mutation
-        if self.fail_pool and rnd.random() < 0.7:
-            base_region = rnd.choice(self.fail_pool)
-        else:
-            base_region = self.region
+        try:
+            base_region=FalsifyAdapter.deserialize(data)
+        except Exception:
+            base_region = copy.deepcopy(self.region)
+            
 
         mutated_region = copy.deepcopy(base_region)
 
@@ -88,8 +106,10 @@ class FalsifyAdapter(FunctionAdapter):
         low = np.minimum(new_low, new_high)
         high = np.maximum(new_low, new_high)
 
-        mutated_region.high = new_high
-        mutated_region.low = new_low
+        # mutated_region.high = new_high
+        # mutated_region.low = new_low
+        mutated_region.low=low
+        mutated_region.high=high
 
         encoded_region = FalsifyAdapter.serialize(mutated_region)
 
@@ -170,7 +190,12 @@ class FalsifyAdapter(FunctionAdapter):
         pre_set = self.pre_set
         try:
             decoded_region=pickle.loads(region)
-
+        except (EOFError, pickle.UnpicklingError, ValueError, TypeError, AttributeError):
+            # Ignore malformed serialized inputs.
+            return
+            # Keep an immutable copy of the decoded input before _falsify mutates it.
+        try:
+            original_decoded_region = copy.deepcopy(decoded_region)
             self._falsify(
                 self.config,
                 decoded_region,
@@ -190,17 +215,14 @@ class FalsifyAdapter(FunctionAdapter):
             if FalsifyAdapter.validate_state_transition(pre_set, post_set):
                 print("success")
             else:
+                self.save_failing_decoded_region(original_decoded_region)
+                raise InvalidStateTransitionError(
+                            f"Invalid transition detected: pre={pre_set}, post={post_set}"
+                        )
                 print("failure")
 
-                # add to fail pool
-                if len(self.fail_pool) < self.max_pool:
-                    self.fail_pool.append(decoded_region)
-                else:
-                    # replace old input with new one to keep size constant
-                    self.fail_pool[random.randrange(self.max_pool)] = decoded_region
-
-            self.counter+=1
-
+            self.counter += 1
+        
         except Exception:
             pass
 
