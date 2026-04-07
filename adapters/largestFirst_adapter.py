@@ -21,12 +21,16 @@ import json
 import time
 import copy
 
+class InvalidStateTransitionError(Exception):
+    """Raised when validate_state_transition() returns False."""
+    pass
+
 class PartitioningAdapter(FunctionAdapter):
 
     def __init__(self, config, function_name, benchmark_name="verapak"):
         super().__init__(config, function_name=function_name)
         self.function_name = function_name
-        self.OUT = Path(f"experiments/{self.function_name}-with-clamp+clip-delete")
+        self.OUT = Path(f"experiments/{self.function_name}-results")
         self.OUT.mkdir(parents=True, exist_ok=True)
         self.cov = coverage.Coverage()
         self.cov.start()
@@ -63,6 +67,27 @@ class PartitioningAdapter(FunctionAdapter):
         #     "SOME_UNSAFE": len(sets[SOME_UNSAFE]),
         # }
 
+        # Create a dedicated corpus directory for Atheris.
+        self.atheris_corpus_dir = self.OUT / "atheris_region_corpus"
+        self.atheris_corpus_dir.mkdir(parents=True, exist_ok=True)
+
+        # Write the initial serialized region seed.
+        seed_path = self.atheris_corpus_dir / "seed_region.pkl"
+        with seed_path.open("wb") as f:
+            pickle.dump(copy.deepcopy(self.region), f)
+
+        # File used to store the decoded region that triggers an invalid transition.
+        self.failure_region_path = self.OUT / "invalid_transition_decoded_region.pkl"
+
+    def get_atheris_corpus_dir(self):
+        """Return the normalized corpus directory used by Atheris."""
+        return str(self.atheris_corpus_dir)
+
+    def save_failing_decoded_region(self, decoded_region):
+        """Save the decoded failing region object to a fixed file."""
+        self.failure_region_path.parent.mkdir(parents=True, exist_ok=True)
+        with self.failure_region_path.open("wb") as f:
+            pickle.dump(decoded_region, f)
 
     def my_mutator(self, data, max_size, seed):
 
@@ -70,11 +95,12 @@ class PartitioningAdapter(FunctionAdapter):
         # Return to previous iteration without copy
         # do operations on the seed
         # use starting regions - do operations based on seed
+        try:
+            base_region = FalsifyAdapter.deserialize(data)
+        except Exception:
+            base_region = copy.deepcopy(self.region)
+
         rnd = random.Random(seed)
-        if self.fail_pool and rnd.random() < 0.7:
-            base_region = rnd.choice(self.fail_pool)
-        else:
-            base_region = self.region
 
         seed_region = copy.deepcopy(base_region)
         new_low = seed_region.low.copy()
@@ -238,7 +264,13 @@ class PartitioningAdapter(FunctionAdapter):
 
     def testoneinput(self, region):
         try:
-            decoded_region = PartitioningAdapter.deserialize(region)
+            decoded_region = pickle.loads(region)
+        except (EOFError, pickle.UnpicklingError, ValueError, TypeError, AttributeError):
+            # Ignore malformed serialized inputs.
+            return
+            # Keep an immutable copy of the decoded input before _falsify mutates it.
+        try:
+            original_decoded_region = copy.deepcopy(decoded_region)
             #print(f"region: {decoded_region.low}, {decoded_region.high}")
             partitions = self._hierarchicalDimensionRefinement(
                 decoded_region,
@@ -267,21 +299,17 @@ class PartitioningAdapter(FunctionAdapter):
                 }
 
                 self.save_crash_report(crash_report)
-                if len(self.fail_pool) < self.max_pool:
-                    self.fail_pool.append(decoded_region)
-                else:
-                    self.fail_pool[random.randrange(self.max_pool)] = decoded_region
+                self.save_failing_decoded_region(original_decoded_region)
+                raise InvalidStateTransitionError(
+                    f"Invalid transition detected"
+                )
+                print("Failure")
             else:
                 print("Success")
             self.counter += 1
 
 
         except Exception:
-            print("=" * 60)
-            print("FUZZER CAUGHT AN EXCEPTION IN testoneinput")
-            print("=" * 60)
-            traceback.print_exc()  # <--- THIS PRINTS THE FULL ERROR
-            print("=" * 60)
             pass
 
         if self.counter > 1000:
