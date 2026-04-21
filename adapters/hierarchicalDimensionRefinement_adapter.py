@@ -191,7 +191,6 @@ class FalsifyAdapter(FunctionAdapter):
             num_dims = decoded["num_dims"]
             divisor = decoded["divisor"]
 
-            # 可选：再做一层防御性检查
             total_dims = region.low.shape[0]
             if not (0 <= num_dims <= total_dims):
                 return
@@ -202,7 +201,6 @@ class FalsifyAdapter(FunctionAdapter):
 
             result = hierarchicalDimensionRefinement(
                 region,
-                self.config["dim_select_strategy"],   # 或固定策略
                 num_dims,
                 divisor,
             )
