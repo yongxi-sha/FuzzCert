@@ -46,9 +46,6 @@ class PartitioningAdapter(FunctionAdapter):
         self._LargestFirstDimSelection = _LargestFirstDimSelection()
         self.counter = 1
 
-        self.fail_pool = []
-        self.max_pool = 512
-
         # Load VERAPAK config
 
         fuzz_args = load_config_from_corpus(input_dir)
@@ -56,9 +53,7 @@ class PartitioningAdapter(FunctionAdapter):
         self.config = config
         self.region = region
         self.sets = sets
-        self.num_dims = 3
-        self.divisor = 2
-
+       
         # self.from_ = UNKNOWN
         # self.pre_set = {
         #     "UNKNOWN": len(sets[UNKNOWN]),
@@ -67,6 +62,12 @@ class PartitioningAdapter(FunctionAdapter):
         #     "SOME_UNSAFE": len(sets[SOME_UNSAFE]),
         # }
 
+        initial_input = {
+            "region": copy.deepcopy(self.region),
+            "num_dims": self.region.low.shape[0],
+            "divisor": 2,
+        }
+
         # Create a dedicated corpus directory for Atheris.
         self.atheris_corpus_dir = self.OUT / "atheris_region_corpus"
         self.atheris_corpus_dir.mkdir(parents=True, exist_ok=True)
@@ -74,7 +75,7 @@ class PartitioningAdapter(FunctionAdapter):
         # Write the initial serialized region seed.
         seed_path = self.atheris_corpus_dir / "seed_region.pkl"
         with seed_path.open("wb") as f:
-            pickle.dump(copy.deepcopy(self.region), f)
+            pickle.dump(initial_input, f)
 
         # File used to store the decoded region that triggers an invalid transition.
         self.failure_region_path = self.OUT / "invalid_transition_decoded_region.pkl"
@@ -90,86 +91,114 @@ class PartitioningAdapter(FunctionAdapter):
             pickle.dump(decoded_region, f)
 
     def my_mutator(self, data, max_size, seed):
-
-
-        # Return to previous iteration without copy
-        # do operations on the seed
-        # use starting regions - do operations based on seed
         try:
-            base_region = FalsifyAdapter.deserialize(data)
+            fuzz_input = FalsifyAdapter.deserialize(data)
         except Exception:
-            base_region = copy.deepcopy(self.region)
+            fuzz_input = {
+                "region": copy.deepcopy(self.region),
+                "num_dims": self.region.low.shape[0],
+                "divisor": 2,
+            }
 
+        mutated = copy.deepcopy(fuzz_input)
+        
+        #initialize random generator
         rnd = random.Random(seed)
 
-        seed_region = copy.deepcopy(base_region)
-        new_low = seed_region.low.copy()
-        new_high = seed_region.high.copy()
+        region = mutated["region"]
+        new_low = region.low.copy()
+        new_high = region.high.copy()
 
         # both high and low should have same shape
         if new_low.shape != new_high.shape:
-            raise Exception("Low and High in Region do not match, invalid region")
+            raise Exception("Low and High shape in Region do not match, invalid region")
         else:
             shape = new_low.shape
             num_elements = new_low.size
 
-        flat_index = random.randrange(num_elements)
-        idx_to_mutate = np.unravel_index(flat_index, shape)
+        # mutate only if we satisfy nonEmptyRegion
+        if num_elements > 0:
+            # pick single index to mutate
+            flat_index = random.randrange(num_elements)
+            idx_to_mutate = np.unravel_index(flat_index, shape)
 
-        current_low = new_low[idx_to_mutate]
-        current_high = new_high[idx_to_mutate]
-        current_width = current_high - current_low
+            current_low = new_low[idx_to_mutate]
+            current_high = new_high[idx_to_mutate]
+            current_width = current_high - current_low
 
-        strategy = random.choice(["jiggle_low", "jiggle_high", "slide", "shrink", "expand"])
-        mutation_scale = 5.0
+            strategy = rnd.choice(["jiggle_low", "jiggle_high", "slide", "shrink", "expand"])
+            # controls size of mutation
+            mutation_scale = 0.5
 
-        if strategy == "jiggle_low":
-            delta = rnd.uniform(-mutation_scale, mutation_scale)
-            new_val = current_low + delta
-            new_low[idx_to_mutate] = new_val
+            if strategy == "jiggle_low":
+                delta = rnd.uniform(-mutation_scale, mutation_scale)
+                new_val = current_low + delta
+                new_low[idx_to_mutate] = new_val
 
-        elif strategy == "jiggle_high":
-            delta = random.uniform(-mutation_scale, mutation_scale)
-            new_val = current_high + delta
-            new_high[idx_to_mutate] = new_val
+            elif strategy == "jiggle_high":
+                delta = rnd.uniform(-mutation_scale, mutation_scale)
+                new_val = current_high + delta
+                new_high[idx_to_mutate] = new_val
 
-        elif strategy == "slide":
-            delta = random.uniform(-mutation_scale, mutation_scale)
-            new_l = current_low + delta
-            new_h = new_l + current_width  # Preserve width
-            new_low[idx_to_mutate] = new_l
-            new_high[idx_to_mutate] = new_h
+            elif strategy == "slide":
+                delta = rnd.uniform(-mutation_scale, mutation_scale)
+                new_l = current_low + delta
+                new_h = new_l + current_width  # Preserve width
+                new_low[idx_to_mutate] = new_l
+                new_high[idx_to_mutate] = new_h
 
-        elif strategy == "shrink":
-            if current_width > 1e-6:  # Avoid shrinking zero-width regions
-                shrink_low = random.uniform(0, current_width / 2)
-                shrink_high = random.uniform(0, current_width / 2)
-                new_low[idx_to_mutate] = current_low + shrink_low
-                new_high[idx_to_mutate] = current_high - shrink_high
+            elif strategy == "shrink":
+                if current_width > 1e-6:  # Avoid shrinking zero-width regions
+                    shrink_low = random.uniform(0, current_width / 2)
+                    shrink_high = random.uniform(0, current_width / 2)
+                    new_low[idx_to_mutate] = current_low + shrink_low
+                    new_high[idx_to_mutate] = current_high - shrink_high
 
-        elif strategy == "expand":
-            expand_low = random.uniform(0, mutation_scale)
-            expand_high = random.uniform(0, mutation_scale)
-            new_l = current_low - expand_low
-            new_h = current_high + expand_high
+            elif strategy == "expand":
+                expand_low = random.uniform(0, mutation_scale)
+                expand_high = random.uniform(0, mutation_scale)
+                new_l = current_low - expand_low
+                new_h = current_high + expand_high
 
-            new_low[idx_to_mutate] = new_l
-            new_high[idx_to_mutate] = new_h
+                new_low[idx_to_mutate] = new_l
+                new_high[idx_to_mutate] = new_h
 
-        # enforce low < high on all dim
-        final_low = np.minimum(new_low, new_high)
-        final_high = np.maximum(new_low, new_high)
+        # mutate num dimensions
+        if rnd.random() < 0.3:
+            mutated["num_dims"] = rnd.randint(0, num_elements)
+        
+        # mutate divisor
+        if rnd.random() < 0.3:
+            mutated["divisor"] = rnd.randint(1, 16)
 
-        seed_region.low = final_low
-        seed_region.high = final_high
-        encoded_region = PartitioningAdapter.serialize(seed_region)
+        # Enforce ValidRegion (low <= high)
+        region.low = np.minimum(new_low, new_high)
+        region.high = np.maximum(new_low, new_high)
 
-        #print(seed_region.low)
-        #print(seed_region.high)
-        if len(encoded_region) <= max_size:
-            return encoded_region[:max_size]
-        else:
-            raise NotImplementedError(f"returned encoded_region exceed max_len: {max_size}")
+        # Enforce divisor > 0
+        if mutated["divisor"] <= 0:
+            mutated["divisor"] = 1
+        
+        # Enforce 0 <= num_dimensions <= total_dimensions
+        if mutated["num_dims"] < 0:
+            mutated["num_dims"] = 1
+        elif mutated["num_dims"] > num_elements:
+            mutated["num_dims"] = num_elements
+        
+        MAX_PARTITIONS = 100_000 # constrain for hardware/memory limits
+        if mutated["divisor"] ** mutated["num_dims"] > MAX_PARTITIONS:
+                # Calculate the maximum allowable divisor for the current num_dims
+                # math: max_div = MAX_PARTITIONS ^ (1 / num_dims)
+                max_allowed_div = int(MAX_PARTITIONS ** (1.0 / mutated["num_dims"]))
+                
+                # Clamp the divisor down to safe limits
+                mutated["divisor"] = max(1, min(mutated["divisor"], max_allowed_div))
+
+        # serialize and return
+        encoded = PartitioningAdapter.serialize(mutated)
+        if len(encoded) <= max_size:
+            return encoded
+        return encoded[:max_size]
 
     @staticmethod
     def serialize(data) -> bytes:
@@ -262,23 +291,23 @@ class PartitioningAdapter(FunctionAdapter):
 
         return results, stats
 
-    def testoneinput(self, region):
+    def testoneinput(self, data):
         try:
-            decoded_region = pickle.loads(region)
+            decoded = pickle.loads(data)
         except (EOFError, pickle.UnpicklingError, ValueError, TypeError, AttributeError):
-            # Ignore malformed serialized inputs.
             return
-            # Keep an immutable copy of the decoded input before _falsify mutates it.
         try:
-            original_decoded_region = copy.deepcopy(decoded_region)
-            #print(f"region: {decoded_region.low}, {decoded_region.high}")
+            parent_region = decoded["region"]
+            num_dims = decoded["num_dims"]
+            divisor = decoded["divisor"]
+
             partitions = self._hierarchicalDimensionRefinement(
-                decoded_region,
+                parent_region,
                 self._LargestFirstDimSelection.rank,
-                self.num_dims,
-                self.divisor,
+                num_dims,
+                divisor
             )
-            checks, stats = self.validate_state_transition(decoded_region, partitions, self.num_dims, self.divisor)
+            checks, stats = self.validate_state_transition(parent_region, partitions, num_dims, divisor)
 
             if not all(checks.values()):
                 # ensure all checks pass
