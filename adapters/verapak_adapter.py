@@ -14,7 +14,10 @@ class VerapakAdapter(BenchAdapter):
     def register_fadapter(self):
         
         from falsify_adapter import FalsifyAdapter
+        from largestFirst_adapter import PartitioningAdapter
         self.add_fadapter("falsify",FalsifyAdapter)
+        self.add_fadapter("partitioning",PartitioningAdapter)
+
 
     def initialize(self, input_dir=None):
         """
